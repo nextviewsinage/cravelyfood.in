@@ -1,0 +1,79 @@
+.login-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #1a0a00 0%, #3d1200 50%, #ff5200 100%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+}
+.login-container::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1200&q=40') center/cover;
+  opacity: 0.06;
+}
+.login-wrapper { width: 100%; max-width: 420px; position: relative; z-index: 1; }
+.login-box {
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.3);
+  overflow: hidden;
+}
+.login-header {
+  background: linear-gradient(135deg, #ff5200 0%, #ff8c00 100%);
+  color: #fff;
+  padding: 32px 24px;
+  text-align: center;
+}
+.login-title { font-size: 2rem; margin: 0 0 6px; font-weight: 900; letter-spacing: -0.5px; }
+.login-subtitle { font-size: 0.95rem; margin: 0; opacity: 0.88; }
+.login-form { padding: 32px; }
+.form-group { margin-bottom: 18px; }
+.form-label { display: block; font-size: 0.82rem; font-weight: 700; color: #444; margin-bottom: 6px; letter-spacing: 0.2px; }
+.form-input {
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 0.95rem;
+  border: 1.5px solid #e0e0e0;
+  border-radius: 10px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+.form-input:focus {
+  border-color: #ff5200;
+  box-shadow: 0 0 0 3px rgba(255,82,0,0.12);
+}
+.error-message {
+  background: #fee2e2;
+  color: #991b1b;
+  padding: 12px 16px;
+  border-radius: 10px;
+  margin-bottom: 16px;
+  font-size: 0.88rem;
+  border-left: 4px solid #ff5200;
+}
+.login-button {
+  width: 100%;
+  padding: 14px;
+  font-size: 1rem;
+  font-weight: 800;
+  color: #fff;
+  background: #ff5200;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.18s;
+  margin-top: 8px;
+  letter-spacing: 0.2px;
+  font-family: inherit;
+}
+.login-button:hover:not(:disabled) { background: #e04800; transform: translateY(-1px); }
+.login-button:disabled { opacity: 0.65; cursor: not-allowed; }
+.login-footer { padding: 0 32px 28px; text-align: center; }
+.signup-text { font-size: 0.9rem; color: #666; }
+.signup-link { color: #ff5200; text-decoration: none; font-weight: 700; }
+.signup-link:hover { text-decoration: underline; }

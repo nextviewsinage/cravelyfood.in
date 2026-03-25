@@ -1,0 +1,10 @@
+/* All navbar styles are in App.css */
+/* Mobile hamburger menu */
+@media (max-width: 768px) {
+  .navbar-links {
+    gap: 4px;
+  }
+  .nav-dropdown-btn span:not(.dropdown-arrow) {
+    display: none;
+  }
+}

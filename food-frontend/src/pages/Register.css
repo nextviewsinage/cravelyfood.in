@@ -1,0 +1,52 @@
+.register-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #1a0a00 0%, #3d1200 50%, #ff5200 100%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+}
+.register-container::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1200&q=40') center/cover;
+  opacity: 0.06;
+}
+.register-wrapper { width: 100%; max-width: 480px; position: relative; z-index: 1; }
+.register-box {
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.3);
+  overflow: hidden;
+}
+.register-header {
+  background: linear-gradient(135deg, #ff5200 0%, #ff8c00 100%);
+  color: #fff;
+  padding: 32px 24px;
+  text-align: center;
+}
+.register-title { font-size: 2rem; margin: 0 0 6px; font-weight: 900; letter-spacing: -0.5px; }
+.register-subtitle { font-size: 0.95rem; margin: 0; opacity: 0.88; }
+.register-form { padding: 32px; }
+.register-button {
+  width: 100%;
+  padding: 14px;
+  font-size: 1rem;
+  font-weight: 800;
+  color: #fff;
+  background: #ff5200;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.18s;
+  margin-top: 8px;
+  font-family: inherit;
+}
+.register-button:hover:not(:disabled) { background: #e04800; transform: translateY(-1px); }
+.register-button:disabled { opacity: 0.65; cursor: not-allowed; }
+.register-footer { padding: 0 32px 28px; text-align: center; }
+.login-text { font-size: 0.9rem; color: #666; }
+.login-link { color: #ff5200; text-decoration: none; font-weight: 700; }
+.login-link:hover { text-decoration: underline; }
