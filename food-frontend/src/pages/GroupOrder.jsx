@@ -121,13 +121,12 @@ export default function GroupOrder() {
             <div className="go-panel-title">Join with invite code</div>
             <div className="go-panel-sub">Ask the group creator for the 8-character invite code</div>
             <input
-              className="form-input go-input"
+              className="form-input go-input go-join-input"
               value={joinCode}
               onChange={e => setJoinCode(e.target.value.toUpperCase())}
               placeholder="Enter code (e.g. ABC12345)"
               maxLength={8}
               onKeyDown={e => e.key === 'Enter' && joinGroup()}
-              className="form-input go-input go-join-input"
             />
             <button className="go-action-btn" onClick={joinGroup}>
               🔗 Join Group
