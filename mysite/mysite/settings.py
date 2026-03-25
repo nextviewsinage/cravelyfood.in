@@ -89,6 +89,9 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# Render pe collectstatic fail na ho agar koi static file missing ho
+WHITENOISE_MANIFEST_STRICT = False
+
 # ── MEDIA ─────────────────────────────────────────────
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
