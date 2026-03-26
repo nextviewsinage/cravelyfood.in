@@ -103,7 +103,7 @@ CORS_ALLOWED_ORIGINS = os.environ.get('CORS_ALLOWED_ORIGINS', ','.join([
     'https://cravelyfood-in-git-main-nextviewsinages-projects.vercel.app',
     'https://cravelyfood-87aybzrws-nextviewsinages-projects.vercel.app',
 ])).split(',')
-CORS_ALLOW_ALL_ORIGINS = os.environ.get('CORS_ALLOW_ALL_ORIGINS', 'False') == 'True'
+CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
 
 # ── REST FRAMEWORK ────────────────────────────────────
