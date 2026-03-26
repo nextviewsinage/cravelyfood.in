@@ -63,7 +63,8 @@ export default function Home() {
 
         try {
           const restRes = await api.get('restaurants/');
-          setRestaurants(restRes.data.slice(0, 4));
+          const restData = Array.isArray(restRes.data) ? restRes.data : (restRes.data.results || []);
+          setRestaurants(restData.slice(0, 4));
         } catch (_) {}
 
       } catch (_) {
