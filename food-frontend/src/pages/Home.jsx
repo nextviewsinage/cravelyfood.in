@@ -43,10 +43,13 @@ export default function Home() {
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setError('');
+        setLoading(true);
         const foodRes = await api.get('foods/');
         // Handle both paginated {results:[]} and plain [] responses
         const foodData = Array.isArray(foodRes.data) ? foodRes.data : (foodRes.data.results || []);
@@ -68,14 +71,16 @@ export default function Home() {
         } catch (_) {}
 
       } catch (err) {
-        console.error('API Error:', err?.response?.status, err?.message, err?.config?.baseURL);
-        setError(`Could not load food items. (${err?.response?.status || err?.message})`);
+        const isTimeout = err.code === 'ECONNABORTED' || err.message?.includes('timeout');
+        setError(isTimeout
+          ? 'Server is waking up, please wait a moment and refresh the page...'
+          : 'Could not load food items. Please try again later.');
       } finally {
         setLoading(false);
       }
     };
     fetchData();
-  }, []);
+  }, [retryCount]);
 
   const filtered = foods.filter((f) => {
     const matchCat = activeCategory === 'All' || f.category_name === activeCategory;
@@ -244,8 +249,14 @@ export default function Home() {
         {loading && <div className="loading-container"><div className="spinner" /></div>}
 
         {!loading && error && foods.length === 0 && (
-          <div style={{ background: '#fee2e2', color: '#991b1b', padding: '16px 20px', borderRadius: '12px', marginBottom: '24px', fontSize: '0.92rem' }}>
-            ⚠️ {error}
+          <div style={{ background: '#fee2e2', color: '#991b1b', padding: '16px 20px', borderRadius: '12px', marginBottom: '24px', fontSize: '0.92rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+            <span>⚠️ {error}</span>
+            <button
+              onClick={() => setRetryCount((c) => c + 1)}
+              style={{ background: '#991b1b', color: '#fff', border: 'none', borderRadius: 8, padding: '6px 14px', cursor: 'pointer', fontWeight: 600, whiteSpace: 'nowrap' }}
+            >
+              Retry
+            </button>
           </div>
         )}
 
