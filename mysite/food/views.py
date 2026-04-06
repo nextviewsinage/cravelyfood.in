@@ -40,7 +40,7 @@ class ProfileView(generics.RetrieveAPIView):
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    permission_classes = [permissions.AllowAny]  # Public read
+    permission_classes = [permissions.IsAuthenticated]
     filter_backends = [filters.SearchFilter]
     search_fields = ['name']
 
@@ -49,7 +49,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
 class RestaurantViewSet(viewsets.ModelViewSet):
     queryset = Restaurant.objects.filter(is_active=True)
     serializer_class = RestaurantSerializer
-    permission_classes = [permissions.AllowAny]  # Public read
+    permission_classes = [permissions.IsAuthenticated]
     filter_backends = [filters.SearchFilter]
     search_fields = ['name', 'city', 'cuisine']
 
@@ -85,7 +85,7 @@ class RestaurantViewSet(viewsets.ModelViewSet):
 class FoodItemViewSet(viewsets.ModelViewSet):
     queryset = FoodItem.objects.filter(available=True).select_related('category', 'restaurant')
     serializer_class = FoodItemSerializer
-    permission_classes = [permissions.AllowAny]  # Public read
+    permission_classes = [permissions.IsAuthenticated]
     filter_backends = [filters.SearchFilter]
     search_fields = ['name', 'category__name', 'restaurant__name']
 
@@ -1058,15 +1058,12 @@ from .serializers import HeroSlideSerializer
 
 
 class HeroSlideViewSet(viewsets.ModelViewSet):
-    """
-    GET /api/slides/ → public (no auth needed)
-    POST/PUT/DELETE  → admin only
-    """
     serializer_class = HeroSlideSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_permissions(self):
         if self.action in ('list', 'retrieve'):
-            return [permissions.AllowAny()]
+            return [permissions.IsAuthenticated()]
         return [permissions.IsAdminUser()]
 
     def get_queryset(self):
