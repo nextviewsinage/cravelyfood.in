@@ -3,7 +3,7 @@ import axios from 'axios';
 // In development, call Django directly to avoid proxy issues
 const BASE_URL = process.env.NODE_ENV === 'development'
   ? 'http://127.0.0.1:8000/api/'
-  : `${process.env.REACT_APP_API_URL}/api/`;
+  : `${process.env.REACT_APP_API_URL || 'https://cravelyfood-in.onrender.com'}/api/`;
 
 const API_KEY = process.env.REACT_APP_API_KEY || 'cravelyfood-api-key-2024';
 
