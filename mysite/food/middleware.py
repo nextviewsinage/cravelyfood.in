@@ -5,9 +5,8 @@ from django.http import JsonResponse
 class APIKeyMiddleware:
     """
     Block direct browser access to /api/ endpoints.
-    Only allow requests that come with the correct X-API-Key header
-    or from trusted origins (Vercel frontend).
-    Auth endpoints are always allowed (login/register).
+    Allows requests from trusted Vercel origins and with correct API key.
+    Auth endpoints always allowed.
     """
 
     ALWAYS_ALLOWED = [
@@ -20,6 +19,15 @@ class APIKeyMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
         self.api_key = os.environ.get('API_SECRET_KEY', 'cravelyfood-api-key-2024')
+        self.trusted_origins = [
+            'https://cravelyfood-in.vercel.app',
+            'http://localhost:3000',
+            'http://127.0.0.1:3000',
+        ]
+        # Add any extra origins from env
+        extra = os.environ.get('CORS_ALLOWED_ORIGINS', '')
+        if extra:
+            self.trusted_origins += [o.strip() for o in extra.split(',') if o.strip()]
 
     def __call__(self, request):
         path = request.path
@@ -33,26 +41,18 @@ class APIKeyMiddleware:
             if path.startswith(allowed):
                 return self.get_response(request)
 
-        # Allow if correct API key header present
-        api_key = request.headers.get('X-API-Key', '')
-        if api_key == self.api_key:
+        # Allow correct API key
+        if request.headers.get('X-API-Key', '') == self.api_key:
             return self.get_response(request)
 
-        # Allow if request comes from trusted Vercel origin
+        # Allow trusted origins
         origin = request.headers.get('Origin', '')
         referer = request.headers.get('Referer', '')
-        trusted = os.environ.get(
-            'CORS_ALLOWED_ORIGINS',
-            'https://cravelyfood-in.vercel.app'
-        )
-        trusted_list = trusted.split(',')
-
-        for t in trusted_list:
-            t = t.strip()
+        for t in self.trusted_origins:
             if t and (origin.startswith(t) or referer.startswith(t)):
                 return self.get_response(request)
 
-        # Block direct browser access
+        # Block everything else
         return JsonResponse(
             {'detail': 'Authentication credentials were not provided.'},
             status=401

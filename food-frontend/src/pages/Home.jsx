@@ -68,7 +68,7 @@ export default function Home() {
         } catch (_) {}
 
       } catch (_) {
-        setError('Could not connect to server. Make sure Django is running on port 8000.');
+        setError('Could not load food items. Please try again later.');
       } finally {
         setLoading(false);
       }
