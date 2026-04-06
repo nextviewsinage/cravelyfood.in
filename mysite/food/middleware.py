@@ -21,6 +21,9 @@ class APIKeyMiddleware:
         self.api_key = os.environ.get('API_SECRET_KEY', 'cravelyfood-api-key-2024')
         self.trusted_origins = [
             'https://cravelyfood-in.vercel.app',
+            'https://cravelyfood-in-git-main-nextviewsinages-projects.vercel.app',
+            'https://cravelyfood-87aybzrws-nextviewsinages-projects.vercel.app',
+            'https://cravelyfood-nayqmqi9a-nextviewsinages-projects.vercel.app',
             'http://localhost:3000',
             'http://127.0.0.1:3000',
         ]

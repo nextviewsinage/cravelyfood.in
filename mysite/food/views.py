@@ -40,7 +40,7 @@ class ProfileView(generics.RetrieveAPIView):
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
     filter_backends = [filters.SearchFilter]
     search_fields = ['name']
 
@@ -49,7 +49,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
 class RestaurantViewSet(viewsets.ModelViewSet):
     queryset = Restaurant.objects.filter(is_active=True)
     serializer_class = RestaurantSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
     filter_backends = [filters.SearchFilter]
     search_fields = ['name', 'city', 'cuisine']
 
@@ -85,7 +85,7 @@ class RestaurantViewSet(viewsets.ModelViewSet):
 class FoodItemViewSet(viewsets.ModelViewSet):
     queryset = FoodItem.objects.filter(available=True).select_related('category', 'restaurant')
     serializer_class = FoodItemSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
     filter_backends = [filters.SearchFilter]
     search_fields = ['name', 'category__name', 'restaurant__name']
 
