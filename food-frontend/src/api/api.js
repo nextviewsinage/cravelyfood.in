@@ -5,9 +5,14 @@ const BASE_URL = process.env.NODE_ENV === 'development'
   ? 'http://127.0.0.1:8000/api/'
   : `${process.env.REACT_APP_API_URL}/api/`;
 
+const API_KEY = process.env.REACT_APP_API_KEY || 'cravelyfood-api-key-2024';
+
 const API = axios.create({
   baseURL: BASE_URL,
   timeout: 15000,
+  headers: {
+    'X-API-Key': API_KEY,
+  },
 });
 
 // Attach token to every request
