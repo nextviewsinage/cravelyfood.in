@@ -40,7 +40,7 @@ class ProfileView(generics.RetrieveAPIView):
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [permissions.AllowAny]  # Public read
     filter_backends = [filters.SearchFilter]
     search_fields = ['name']
 
@@ -49,7 +49,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
 class RestaurantViewSet(viewsets.ModelViewSet):
     queryset = Restaurant.objects.filter(is_active=True)
     serializer_class = RestaurantSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [permissions.AllowAny]  # Public read
     filter_backends = [filters.SearchFilter]
     search_fields = ['name', 'city', 'cuisine']
 
@@ -85,7 +85,7 @@ class RestaurantViewSet(viewsets.ModelViewSet):
 class FoodItemViewSet(viewsets.ModelViewSet):
     queryset = FoodItem.objects.filter(available=True).select_related('category', 'restaurant')
     serializer_class = FoodItemSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [permissions.AllowAny]  # Public read
     filter_backends = [filters.SearchFilter]
     search_fields = ['name', 'category__name', 'restaurant__name']
 
@@ -1059,9 +1059,8 @@ from .serializers import HeroSlideSerializer
 
 class HeroSlideViewSet(viewsets.ModelViewSet):
     """
-    Admin can CRUD slides. Public can only read active/live slides.
-    GET /api/slides/          → all live slides (public)
-    POST/PUT/DELETE           → admin only
+    GET /api/slides/ → public (no auth needed)
+    POST/PUT/DELETE  → admin only
     """
     serializer_class = HeroSlideSerializer
 
@@ -1071,7 +1070,6 @@ class HeroSlideViewSet(viewsets.ModelViewSet):
         return [permissions.IsAdminUser()]
 
     def get_queryset(self):
-        # Public: only live slides
         if self.request.method == 'GET' and not (
             self.request.user and self.request.user.is_staff
         ):

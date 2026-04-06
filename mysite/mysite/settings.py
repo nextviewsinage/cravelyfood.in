@@ -102,6 +102,7 @@ CORS_ALLOWED_ORIGINS = os.environ.get('CORS_ALLOWED_ORIGINS', ','.join([
     'http://127.0.0.1:3000',
     'https://cravelyfood-in-git-main-nextviewsinages-projects.vercel.app',
     'https://cravelyfood-87aybzrws-nextviewsinages-projects.vercel.app',
+    'https://cravelyfood-nayqmqi9a-nextviewsinages-projects.vercel.app',
 ])).split(',')
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
@@ -111,6 +112,7 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
+    # Public read, write needs login — individual views override this
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticatedOrReadOnly',
     ),
