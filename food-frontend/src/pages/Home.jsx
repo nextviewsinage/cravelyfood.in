@@ -67,8 +67,9 @@ export default function Home() {
           setRestaurants(restData.slice(0, 4));
         } catch (_) {}
 
-      } catch (_) {
-        setError('Could not load food items. Please try again later.');
+      } catch (err) {
+        console.error('API Error:', err?.response?.status, err?.message, err?.config?.baseURL);
+        setError(`Could not load food items. (${err?.response?.status || err?.message})`);
       } finally {
         setLoading(false);
       }
