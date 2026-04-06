@@ -97,15 +97,20 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 # ── CORS ──────────────────────────────────────────────
-CORS_ALLOWED_ORIGINS = os.environ.get('CORS_ALLOWED_ORIGINS', ','.join([
-    'http://localhost:3000',
-    'http://127.0.0.1:3000',
-    'https://cravelyfood-in-git-main-nextviewsinages-projects.vercel.app',
-    'https://cravelyfood-87aybzrws-nextviewsinages-projects.vercel.app',
-    'https://cravelyfood-nayqmqi9a-nextviewsinages-projects.vercel.app',
-])).split(',')
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+    'x-api-key',
+]
 
 # ── REST FRAMEWORK ────────────────────────────────────
 REST_FRAMEWORK = {
