@@ -3,7 +3,7 @@ import axios from 'axios';
 // In development, call Django directly to avoid proxy issues
 const BASE_URL = process.env.NODE_ENV === 'development'
   ? 'http://127.0.0.1:8000/api/'
-  : `${process.env.REACT_APP_API_URL || ''}/api/`;
+  : `${process.env.REACT_APP_API_URL}/api/`;
 
 const API = axios.create({
   baseURL: BASE_URL,
