@@ -3,7 +3,7 @@ import api from '../api/api';
 import { CartContext } from '../context/CartContext';
 import { useNotification } from '../context/NotificationContext';
 
-const SUGGESTIONS = ['Burger', 'Pizza', 'Biryani', 'Momos', 'Dosa', 'Paneer', 'Noodles', 'Chicken'];
+const SUGGESTIONS = ['Burger', 'Pizza', 'Biryani', 'Momos', 'Dosa', 'Paneer', 'Noodles'];
 
 export default function SmartCombo() {
   const [query, setQuery] = useState('');

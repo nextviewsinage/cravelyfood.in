@@ -989,14 +989,13 @@ class SmartComboView(APIView):
 
     # Combo rules: keyword → [main_tags, side_tags, drink_tags]
     COMBO_RULES = {
-        'burger':   (['burger'],                    ['fries', 'french fries', 'wings', 'nuggets'], ['cold coffee', 'cola', 'shake', 'lassi']),
+        'burger':   (['burger'],                    ['fries', 'french fries', 'nuggets'],          ['cold coffee', 'cola', 'shake', 'lassi']),
         'pizza':    (['pizza'],                     ['garlic bread', 'fries', 'spring rolls'],     ['cold coffee', 'cola', 'juice']),
-        'biryani':  (['biryani'],                   ['raita', 'salad', 'kebab', 'tikka'],          ['lassi', 'cola', 'lime soda']),
+        'biryani':  (['biryani', 'veg biryani'],    ['raita', 'salad', 'papad'],                   ['lassi', 'cola', 'lime soda']),
         'dosa':     (['dosa', 'masala dosa'],       ['vada', 'idli', 'sambar'],                    ['chai', 'coffee', 'juice']),
         'momos':    (['momos', 'dumpling'],         ['spring rolls', 'fries', 'soup'],             ['cola', 'lime soda', 'tea']),
         'noodles':  (['noodles', 'hakka'],          ['spring rolls', 'manchurian', 'soup'],        ['cola', 'lime soda']),
         'paneer':   (['paneer'],                    ['naan', 'roti', 'rice', 'dal'],               ['lassi', 'chai', 'lime soda']),
-        'chicken':  (['chicken'],                   ['naan', 'rice', 'salad', 'raita'],            ['lassi', 'cola', 'lime soda']),
         'pasta':    (['pasta'],                     ['garlic bread', 'soup', 'salad'],             ['cold coffee', 'juice', 'cola']),
         'sandwich': (['sandwich'],                  ['fries', 'soup', 'salad'],                    ['cold coffee', 'juice', 'shake']),
     }
@@ -1007,7 +1006,7 @@ class SmartComboView(APIView):
         for t in tags:
             q |= Q(name__icontains=t) | Q(category__name__icontains=t)
         return list(
-            FoodItem.objects.filter(available=True).filter(q)
+            FoodItem.objects.filter(available=True, is_veg=True).filter(q)
             .exclude(id__in=exclude_ids)[:limit]
         )
 
