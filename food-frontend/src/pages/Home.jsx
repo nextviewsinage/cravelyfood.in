@@ -25,13 +25,16 @@ const CAT_ICONS = {
   'Coffee': '☕', 'Tea': '🍵', 'Juices': '🧃', 'Cold Drinks': '🥤',
   'Indian Breakfast': '🌅', 'Light Breakfast': '🍞',
   'Western Breakfast': '🥞', 'Breakfast Drinks': '🥛',
+  'Desserts': '🍰', 'Beverages': '🧋', 'Rolls': '🌯', 'Pasta': '🍝',
+  'Breakfast': '🍳', 'Seafood': '🦐', 'Momos': '🥟', 'Soups': '🍲',
 };
 
 const CAT_GROUPS = [
-  { label: '🔥 Popular', cats: ['Pizza', 'Burgers', 'Biryani', 'Chinese', 'Fast Food', 'Street Food', 'Snacks', 'Rolls & Wraps', 'Sandwiches', 'South Indian', 'North Indian', 'Punjabi', 'Gujarati', 'Thali'] },
+  { label: '🔥 Popular', cats: ['Pizza', 'Burgers', 'Biryani', 'Chinese', 'Fast Food', 'Street Food', 'Snacks', 'Rolls & Wraps', 'Rolls', 'Sandwiches', 'South Indian', 'North Indian', 'Punjabi', 'Gujarati', 'Thali', 'General', 'Momos', 'Pasta', 'Soups'] },
+  { label: '🍗 Non-Veg', cats: ['Chicken Items', 'Mutton Dishes', 'Fish & Seafood', 'Seafood', 'Tandoori Items', 'Kebabs'] },
   { label: '🥗 Veg & Healthy', cats: ['Pure Veg', 'Jain Food', 'Salads', 'Healthy Meals', 'Diet Food'] },
-  { label: '🌅 Breakfast', cats: ['Indian Breakfast', 'Light Breakfast', 'Western Breakfast', 'Breakfast Drinks'] },
-  { label: '🍰 Desserts & Drinks', cats: ['Cakes', 'Ice Cream', 'Sweets', 'Shakes', 'Coffee', 'Tea', 'Juices', 'Cold Drinks'] },
+  { label: '🌅 Breakfast', cats: ['Indian Breakfast', 'Light Breakfast', 'Western Breakfast', 'Breakfast Drinks', 'Breakfast'] },
+  { label: '🍰 Desserts & Drinks', cats: ['Cakes', 'Ice Cream', 'Sweets', 'Desserts', 'Shakes', 'Coffee', 'Tea', 'Juices', 'Cold Drinks', 'Beverages'] },
 ];
 
 export default function Home() {
