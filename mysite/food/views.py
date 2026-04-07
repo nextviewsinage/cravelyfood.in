@@ -60,6 +60,78 @@ class RegisterView(generics.CreateAPIView):
     permission_classes = (permissions.AllowAny,)
 
 
+# ── PHONE OTP LOGIN ───────────────────────────────────
+class SendOTPView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        phone = request.data.get('phone', '').strip()
+        if not phone or len(phone) < 10:
+            return Response({'error': 'Valid phone number required'}, status=400)
+
+        import random
+        from .models import PhoneOTP
+        # Delete old OTPs for this phone
+        PhoneOTP.objects.filter(phone=phone).delete()
+        otp = str(random.randint(100000, 999999))
+        PhoneOTP.objects.create(phone=phone, otp=otp)
+
+        # In production: send via SMS (Twilio/Fast2SMS)
+        # For now: print to console (dev mode)
+        print(f"\n📱 OTP for {phone}: {otp}\n")
+
+        return Response({'message': f'OTP sent to {phone}', 'dev_otp': otp})
+
+
+class VerifyOTPView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        phone = request.data.get('phone', '').strip()
+        otp = request.data.get('otp', '').strip()
+
+        from .models import PhoneOTP
+        from rest_framework_simplejwt.tokens import RefreshToken
+
+        record = PhoneOTP.objects.filter(phone=phone, otp=otp).last()
+        if not record or not record.is_valid():
+            return Response({'error': 'Invalid or expired OTP'}, status=400)
+
+        record.is_used = True
+        record.save()
+
+        # Find or create user by phone
+        user = User.objects.filter(username=f'phone_{phone}').first()
+        if not user:
+            user = User.objects.create_user(
+                username=f'phone_{phone}',
+                password=User.objects.make_random_password(),
+            )
+            from .models import UserProfile
+            UserProfile.objects.get_or_create(user=user, defaults={'phone': phone, 'role': 'customer'})
+        else:
+            # Update phone in profile
+            try:
+                user.profile.phone = phone
+                user.profile.save()
+            except Exception:
+                pass
+
+        refresh = RefreshToken.for_user(user)
+        # Add role to token
+        try:
+            refresh['role'] = user.profile.role
+        except Exception:
+            refresh['role'] = 'customer'
+        refresh['username'] = user.username
+
+        return Response({
+            'access': str(refresh.access_token),
+            'refresh': str(refresh),
+            'username': user.username,
+        })
+
+
 class ProfileView(generics.RetrieveAPIView):
     serializer_class = UserSerializer
     permission_classes = (permissions.IsAuthenticated,)

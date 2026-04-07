@@ -464,3 +464,19 @@ class UserProfile(models.Model):
 
     def __str__(self):
         return f"{self.user.username} ({self.role})"
+
+
+# ── PHONE OTP ─────────────────────────────────────────
+class PhoneOTP(models.Model):
+    phone = models.CharField(max_length=15)
+    otp = models.CharField(max_length=6)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_used = models.BooleanField(default=False)
+
+    def is_valid(self):
+        from django.utils import timezone
+        # OTP valid for 10 minutes
+        return not self.is_used and (timezone.now() - self.created_at).seconds < 600
+
+    def __str__(self):
+        return f"{self.phone} — {self.otp}"

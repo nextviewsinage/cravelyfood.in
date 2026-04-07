@@ -12,6 +12,7 @@ from .views import (
     SubscriptionView, ReferralView, GroupOrderViewSet,
     DeliveryETAView, DynamicOfferView, PushCampaignView,
     EmailOrUsernameTokenView,
+    SendOTPView, VerifyOTPView,
     # New
     FoodVideoViewSet, GroceryCategoryViewSet, GroceryItemViewSet,
     ImageSearchView, BadgeListView, UserBadgeView, LeaderboardView, VoiceSearchView,
@@ -38,6 +39,8 @@ urlpatterns = [
     path('auth/register/', RegisterView.as_view(), name='auth_register'),
     path('auth/profile/', ProfileView.as_view(), name='auth_profile'),
     path('auth/token/', EmailOrUsernameTokenView.as_view(), name='token_obtain_pair'),
+    path('auth/otp/send/', SendOTPView.as_view(), name='otp_send'),
+    path('auth/otp/verify/', VerifyOTPView.as_view(), name='otp_verify'),
     path('auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('search/', SearchView.as_view(), name='search'),
     path('coupons/validate/', CouponValidateView.as_view(), name='coupon_validate'),
