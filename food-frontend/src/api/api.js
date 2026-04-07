@@ -9,7 +9,7 @@ const API_KEY = process.env.REACT_APP_API_KEY || 'cravelyfood-api-key-2024';
 
 const API = axios.create({
   baseURL: BASE_URL,
-  timeout: 15000,
+  timeout: 60000, // 60s for Render cold starts
   headers: {
     'X-API-Key': API_KEY,
   },
@@ -29,6 +29,16 @@ API.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
+
+    // Retry on timeout/network error (Render cold start)
+    const isTimeout = error.code === 'ECONNABORTED' || error.message?.includes('timeout');
+    const isNetwork = !error.response;
+    if ((isTimeout || isNetwork) && !originalRequest._retry) {
+      originalRequest._retry = true;
+      await new Promise((r) => setTimeout(r, 3000));
+      return API(originalRequest);
+    }
+
     const isAuthEndpoint =
       originalRequest.url?.includes('auth/token') ||
       originalRequest.url?.includes('auth/register');
