@@ -69,7 +69,7 @@ class SendOTPView(APIView):
         if not phone or len(phone) < 10:
             return Response({'error': 'Valid phone number required'}, status=400)
 
-        import random, requests as req
+        import random, os, requests as req
         from .models import PhoneOTP
 
         PhoneOTP.objects.filter(phone=phone).delete()
