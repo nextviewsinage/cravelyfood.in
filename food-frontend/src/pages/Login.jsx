@@ -64,9 +64,15 @@ export default function Login() {
     try {
       const res = await api.post('auth/otp/send/', { phone });
       setOtpSent(true);
-      if (res.data.dev_otp) setDevOtp(res.data.dev_otp); // show in dev
-    } catch {
-      setError('Could not send OTP. Try again.');
+      setDevOtp(res.data.dev_otp || '');
+    } catch (err) {
+      // Even on error, if we got a response with dev_otp, show OTP screen
+      if (err.response?.data?.dev_otp) {
+        setOtpSent(true);
+        setDevOtp(err.response.data.dev_otp);
+      } else {
+        setError('Could not send OTP. Try again.');
+      }
     } finally {
       setLoading(false);
     }

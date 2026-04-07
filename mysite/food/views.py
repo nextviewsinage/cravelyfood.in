@@ -92,9 +92,7 @@ class SendOTPView(APIView):
             except Exception:
                 pass
 
-        resp_data = {'message': f'OTP sent to +91{phone}'}
-        if not sms_sent:
-            resp_data['dev_otp'] = otp  # show in UI if SMS failed
+        resp_data = {'message': f'OTP sent to +91{phone}', 'dev_otp': otp}
         return Response(resp_data)
 
 
