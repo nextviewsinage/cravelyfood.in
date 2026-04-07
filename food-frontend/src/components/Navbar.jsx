@@ -79,7 +79,7 @@ function Dropdown({ label, links, wide = false }) {
 }
 
 export default function Navbar() {
-  const { isLoggedIn, logout } = useAuth();
+  const { isLoggedIn, logout, role, isAdmin, isDelivery } = useAuth();
   const { cart } = useContext(CartContext);
   const { dark, toggle } = useTheme();
   const location = useLocation();
@@ -113,7 +113,7 @@ export default function Navbar() {
     <nav className="navbar">
       <div className="navbar-container">
         {/* Brand */}
-        <Link to="/" className="navbar-brand">🍽️ FoodDelivery</Link>
+        <Link to="/" className="navbar-brand">🍽️ Cravely</Link>
 
         {/* Links */}
         <div className="navbar-links">
@@ -175,9 +175,28 @@ export default function Navbar() {
 
           {/* Auth */}
           {isLoggedIn ? (
-            <button onClick={logout} className="nav-link login-btn" style={{ border: 'none', cursor: 'pointer' }}>
-              Logout
-            </button>
+            <>
+              {isAdmin && (
+                <Link to="/admin/dashboard" className="nav-link" style={{ color: '#ff5200', fontWeight: 700 }}>
+                  📊 Admin
+                </Link>
+              )}
+              {isDelivery && (
+                <Link to="/delivery" className="nav-link" style={{ color: '#2e7d32', fontWeight: 700 }}>
+                  🛵 Dashboard
+                </Link>
+              )}
+              <span style={{
+                fontSize: '0.72rem', padding: '3px 8px', borderRadius: 20, fontWeight: 700,
+                background: isAdmin ? '#fff3e0' : isDelivery ? '#e8f5e9' : '#f0f4ff',
+                color: isAdmin ? '#e65100' : isDelivery ? '#2e7d32' : '#3949ab',
+              }}>
+                {isAdmin ? '👑 Admin' : isDelivery ? '🛵 Delivery' : '🛒 Customer'}
+              </span>
+              <button onClick={logout} className="nav-link login-btn" style={{ border: 'none', cursor: 'pointer' }}>
+                Logout
+              </button>
+            </>
           ) : (
             <Link to="/login" className="nav-link login-btn">Login</Link>
           )}

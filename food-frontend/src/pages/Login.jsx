@@ -29,7 +29,12 @@ export default function Login() {
       const res = await api.post('auth/token/', { username: username.trim(), password });
       login(res.data.access, res.data.refresh);
       if (rememberMe) localStorage.setItem('remember_me', 'true');
-      navigate('/');
+      // Role-based redirect
+      const payload = JSON.parse(atob(res.data.access.split('.')[1]));
+      const role = payload.role || (payload.is_staff || payload.is_superuser ? 'admin' : 'customer');
+      if (role === 'admin') navigate('/admin/dashboard');
+      else if (role === 'delivery') navigate('/delivery');
+      else navigate('/');
     } catch (err) {
       if (err.response?.status === 401) {
         setError('Incorrect username or password. Please try again.');

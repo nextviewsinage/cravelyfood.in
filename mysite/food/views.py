@@ -24,11 +24,23 @@ from .serializers import (
 
 
 # ── AUTH ──────────────────────────────────────────────
+# ── AUTH ──────────────────────────────────────────────
 class EmailOrUsernameTokenSerializer(TokenObtainPairSerializer):
-    """Allow login with email OR username"""
+    """Allow login with email OR username, add role to token"""
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+        # Add role to JWT payload
+        try:
+            token['role'] = user.profile.role
+        except Exception:
+            token['role'] = 'admin' if (user.is_staff or user.is_superuser) else 'customer'
+        token['username'] = user.username
+        token['email'] = user.email
+        return token
+
     def validate(self, attrs):
         login_input = attrs.get('username', '')
-        # If it looks like an email, find the username
         if '@' in login_input:
             try:
                 user = User.objects.get(email__iexact=login_input)
