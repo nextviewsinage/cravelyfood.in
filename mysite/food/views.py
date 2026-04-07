@@ -69,18 +69,35 @@ class SendOTPView(APIView):
         if not phone or len(phone) < 10:
             return Response({'error': 'Valid phone number required'}, status=400)
 
-        import random
+        import random, requests as req
         from .models import PhoneOTP
-        # Delete old OTPs for this phone
+
         PhoneOTP.objects.filter(phone=phone).delete()
         otp = str(random.randint(100000, 999999))
         PhoneOTP.objects.create(phone=phone, otp=otp)
 
-        # In production: send via SMS (Twilio/Fast2SMS)
-        # For now: print to console (dev mode)
-        print(f"\n📱 OTP for {phone}: {otp}\n")
+        # Send via Fast2SMS
+        api_key = os.environ.get('FAST2SMS_API_KEY', '6ukj3ZnfMdS7LtCBDUg1wzaAveomqIGYQrFO8VJTlbx02NcPHX3qaXlnecxAL5kwPv6RFZhQGip29JVD')
+        try:
+            resp = req.get(
+                'https://www.fast2sms.com/dev/bulkV2',
+                params={
+                    'authorization': api_key,
+                    'route': 'otp',
+                    'variables_values': otp,
+                    'flash': '0',
+                    'numbers': phone,
+                },
+                timeout=10
+            )
+            data = resp.json()
+            if not data.get('return'):
+                # Fallback: show OTP in response for dev
+                return Response({'message': f'OTP sent to {phone}', 'dev_otp': otp})
+        except Exception:
+            return Response({'message': f'OTP sent to {phone}', 'dev_otp': otp})
 
-        return Response({'message': f'OTP sent to {phone}', 'dev_otp': otp})
+        return Response({'message': f'OTP sent to +91{phone}'})
 
 
 class VerifyOTPView(APIView):
