@@ -31,7 +31,6 @@ const CAT_ICONS = {
 
 const CAT_GROUPS = [
   { label: '🔥 Popular', cats: ['Pizza', 'Burgers', 'Biryani', 'Chinese', 'Fast Food', 'Street Food', 'Snacks', 'Rolls & Wraps', 'Rolls', 'Sandwiches', 'South Indian', 'North Indian', 'Punjabi', 'Gujarati', 'Thali', 'General', 'Momos', 'Pasta', 'Soups'] },
-  { label: '🍗 Non-Veg', cats: ['Chicken Items', 'Mutton Dishes', 'Fish & Seafood', 'Seafood', 'Tandoori Items', 'Kebabs'] },
   { label: '🥗 Veg & Healthy', cats: ['Pure Veg', 'Jain Food', 'Salads', 'Healthy Meals', 'Diet Food'] },
   { label: '🌅 Breakfast', cats: ['Indian Breakfast', 'Light Breakfast', 'Western Breakfast', 'Breakfast Drinks', 'Breakfast'] },
   { label: '🍰 Desserts & Drinks', cats: ['Cakes', 'Ice Cream', 'Sweets', 'Desserts', 'Shakes', 'Coffee', 'Tea', 'Juices', 'Cold Drinks', 'Beverages'] },
