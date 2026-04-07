@@ -17,16 +17,6 @@ export default function Login() {
 
   const justRegistered = location.state?.registered;
 
-export default function Login() {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const navigate = useNavigate();
-  const { login } = useAuth();
-
   const handleLogin = async (e) => {
     e.preventDefault();
     if (!username.trim() || !password.trim()) {
@@ -69,11 +59,7 @@ export default function Login() {
                 ✅ Account created! Please login.
               </div>
             )}
-            {error && (
-              <div className="error-message">
-                🔒 {error}
-              </div>
-            )}
+            {error && <div className="error-message">🔒 {error}</div>}
 
             <div className="form-group">
               <label htmlFor="username" className="form-label">Username or Email</label>
