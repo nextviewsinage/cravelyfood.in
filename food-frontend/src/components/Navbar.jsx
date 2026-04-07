@@ -79,7 +79,7 @@ function Dropdown({ label, links, wide = false }) {
 }
 
 export default function Navbar() {
-  const { isLoggedIn, logout, role, isAdmin, isDelivery } = useAuth();
+  const { isLoggedIn, logout, isAdmin, isDelivery } = useAuth();
   const { cart } = useContext(CartContext);
   const { dark, toggle } = useTheme();
   const location = useLocation();
