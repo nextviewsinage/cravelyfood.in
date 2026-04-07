@@ -53,7 +53,8 @@ export default function Register() {
       <div className="register-wrapper">
         <div className="register-box">
           <div className="register-header">
-            <h1 className="register-title">🍕 Food Delivery</h1>
+            <div style={{ fontSize: '2.5rem', marginBottom: 8 }}>🍔</div>
+            <h1 className="register-title">Cravely</h1>
             <p className="register-subtitle">Create Your Account</p>
           </div>
 
