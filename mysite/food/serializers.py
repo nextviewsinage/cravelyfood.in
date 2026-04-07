@@ -7,10 +7,21 @@ from .models import Category, FoodItem, Order, Restaurant, Review, ReviewImage, 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
     password2 = serializers.CharField(write_only=True)
+    role = serializers.ChoiceField(
+        choices=['customer', 'delivery'],
+        default='customer',
+        write_only=True,
+        required=False,
+    )
 
     class Meta:
         model = User
-        fields = ("username", "email", "password", "password2", "first_name", "last_name")
+        fields = ("username", "email", "password", "password2", "first_name", "last_name", "role")
+
+    def validate_email(self, value):
+        if User.objects.filter(email=value).exists():
+            raise serializers.ValidationError("This email is already registered.")
+        return value
 
     def validate(self, data):
         if data["password"] != data["password2"]:
@@ -18,18 +29,30 @@ class RegisterSerializer(serializers.ModelSerializer):
         return data
 
     def create(self, validated_data):
+        role = validated_data.pop("role", "customer")
         validated_data.pop("password2")
         password = validated_data.pop("password")
         user = User(**validated_data)
         user.set_password(password)
         user.save()
+        # Create profile with role
+        from .models import UserProfile
+        UserProfile.objects.create(user=user, role=role)
         return user
 
 
 class UserSerializer(serializers.ModelSerializer):
+    role = serializers.SerializerMethodField()
+
     class Meta:
         model = User
-        fields = ("id", "username", "email", "first_name", "last_name")
+        fields = ("id", "username", "email", "first_name", "last_name", "role")
+
+    def get_role(self, obj):
+        try:
+            return obj.profile.role
+        except Exception:
+            return 'customer'
 
 
 class CategorySerializer(serializers.ModelSerializer):

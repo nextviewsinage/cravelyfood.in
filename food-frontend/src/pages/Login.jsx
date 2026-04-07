@@ -1,8 +1,21 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/api';
 import './Login.css';
+
+export default function Login() {
+  const location = useLocation();
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
+  const { login } = useAuth();
+
+  const justRegistered = location.state?.registered;
 
 export default function Login() {
   const [username, setUsername] = useState('');
@@ -51,6 +64,11 @@ export default function Login() {
           </div>
 
           <form className="login-form" onSubmit={handleLogin}>
+            {justRegistered && (
+              <div style={{ background: '#d1fae5', color: '#065f46', padding: '10px 14px', borderRadius: 8, marginBottom: 14, fontSize: '0.88rem' }}>
+                ✅ Account created! Please login.
+              </div>
+            )}
             {error && (
               <div className="error-message">
                 🔒 {error}
@@ -58,12 +76,12 @@ export default function Login() {
             )}
 
             <div className="form-group">
-              <label htmlFor="username" className="form-label">Username</label>
+              <label htmlFor="username" className="form-label">Username or Email</label>
               <input
                 id="username"
                 type="text"
                 className="form-input"
-                placeholder="Enter your username"
+                placeholder="Enter username or email"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 autoComplete="username"

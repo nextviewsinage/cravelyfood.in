@@ -1,6 +1,5 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from .views import (
     CategoryViewSet, FoodItemViewSet, OrderViewSet,
     RestaurantViewSet, ReviewViewSet, WishlistViewSet,
@@ -11,6 +10,7 @@ from .views import (
     AIFeedView, MoodFoodView, FlashDealViewSet, LoyaltyView,
     SubscriptionView, ReferralView, GroupOrderViewSet,
     DeliveryETAView, DynamicOfferView, PushCampaignView,
+    EmailOrUsernameTokenView,
     # New
     FoodVideoViewSet, GroceryCategoryViewSet, GroceryItemViewSet,
     ImageSearchView, BadgeListView, UserBadgeView, LeaderboardView, VoiceSearchView,
@@ -36,7 +36,7 @@ urlpatterns = [
     path('', include(router.urls)),
     path('auth/register/', RegisterView.as_view(), name='auth_register'),
     path('auth/profile/', ProfileView.as_view(), name='auth_profile'),
-    path('auth/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('auth/token/', EmailOrUsernameTokenView.as_view(), name='token_obtain_pair'),
     path('auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('search/', SearchView.as_view(), name='search'),
     path('coupons/validate/', CouponValidateView.as_view(), name='coupon_validate'),

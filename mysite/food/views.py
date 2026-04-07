@@ -6,6 +6,8 @@ from rest_framework import viewsets, filters, generics, permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 from .models import (
     Category, FoodItem, Order, Restaurant, Review, Coupon, Wishlist, DeliveryBoy,
@@ -22,6 +24,24 @@ from .serializers import (
 
 
 # ── AUTH ──────────────────────────────────────────────
+class EmailOrUsernameTokenSerializer(TokenObtainPairSerializer):
+    """Allow login with email OR username"""
+    def validate(self, attrs):
+        login_input = attrs.get('username', '')
+        # If it looks like an email, find the username
+        if '@' in login_input:
+            try:
+                user = User.objects.get(email__iexact=login_input)
+                attrs['username'] = user.username
+            except User.DoesNotExist:
+                pass
+        return super().validate(attrs)
+
+
+class EmailOrUsernameTokenView(TokenObtainPairView):
+    serializer_class = EmailOrUsernameTokenSerializer
+
+
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = RegisterSerializer
