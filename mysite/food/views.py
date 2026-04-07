@@ -77,27 +77,25 @@ class SendOTPView(APIView):
         PhoneOTP.objects.create(phone=phone, otp=otp)
 
         # Send via Fast2SMS
-        api_key = os.environ.get('FAST2SMS_API_KEY', '6ukj3ZnfMdS7LtCBDUg1wzaAveomqIGYQrFO8VJTlbx02NcPHX3qaXlnecxAL5kwPv6RFZhQGip29JVD')
-        try:
-            resp = req.get(
-                'https://www.fast2sms.com/dev/bulkV2',
-                params={
-                    'authorization': api_key,
-                    'route': 'otp',
-                    'variables_values': otp,
-                    'flash': '0',
-                    'numbers': phone,
-                },
-                timeout=10
-            )
-            data = resp.json()
-            if not data.get('return'):
-                # Fallback: show OTP in response for dev
-                return Response({'message': f'OTP sent to {phone}', 'dev_otp': otp})
-        except Exception:
-            return Response({'message': f'OTP sent to {phone}', 'dev_otp': otp})
+        api_key = os.environ.get('FAST2SMS_API_KEY', '')
+        sms_sent = False
+        if api_key:
+            try:
+                resp = req.post(
+                    'https://www.fast2sms.com/dev/bulkV2',
+                    headers={'authorization': api_key},
+                    json={'route': 'q', 'message': f'Your Cravely OTP is {otp}. Valid 10 min.', 'language': 'english', 'flash': 0, 'numbers': phone},
+                    timeout=8
+                )
+                if resp.json().get('return'):
+                    sms_sent = True
+            except Exception:
+                pass
 
-        return Response({'message': f'OTP sent to +91{phone}'})
+        resp_data = {'message': f'OTP sent to +91{phone}'}
+        if not sms_sent:
+            resp_data['dev_otp'] = otp  # show in UI if SMS failed
+        return Response(resp_data)
 
 
 class VerifyOTPView(APIView):
