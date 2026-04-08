@@ -6,13 +6,12 @@ import './Login.css';
 
 export default function Login() {
   const location = useLocation();
-  const [tab, setTab] = useState('password'); // 'password' | 'otp'
+  const [tab, setTab] = useState('password');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [phone, setPhone] = useState('');
   const [otp, setOtp] = useState('');
   const [otpSent, setOtpSent] = useState(false);
-  const [devOtp, setDevOtp] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -32,15 +31,10 @@ export default function Login() {
     return '/';
   };
 
-  // Password login
   const handleLogin = async (e) => {
     e.preventDefault();
-    if (!username.trim() || !password.trim()) {
-      setError('Please enter both username and password.');
-      return;
-    }
-    setLoading(true);
-    setError('');
+    if (!username.trim() || !password.trim()) { setError('Please enter both username and password.'); return; }
+    setLoading(true); setError('');
     try {
       const res = await api.post('auth/token/', { username: username.trim(), password });
       login(res.data.access, res.data.refresh);
@@ -50,74 +44,36 @@ export default function Login() {
       if (err.response?.status === 401) setError('Incorrect username or password.');
       else if (!err.response) setError('Server not reachable. Please try again later.');
       else setError(err.response?.data?.detail || 'Login failed.');
-    } finally {
-      setLoading(false);
-    }
+    } finally { setLoading(false); }
   };
 
-  // Send OTP
   const handleSendOtp = async (e) => {
     e.preventDefault();
     if (!phone || phone.length < 10) { setError('Enter valid 10-digit phone number.'); return; }
-    setLoading(true);
-    setError('');
+    setLoading(true); setError('');
     try {
-      const res = await api.post('auth/otp/send/', { phone });
+      await api.post('auth/otp/send/', { phone });
       setOtpSent(true);
-      setDevOtp(res.data.dev_otp || '');
     } catch (err) {
-      const d = err.response?.data;
-      if (d?.dev_otp) {
+      if (err.response?.data?.message) {
         setOtpSent(true);
-        setDevOtp(d.dev_otp);
-      } else if (d?.message) {
-        setOtpSent(true);
-        setDevOtp('');
       } else {
-        // Backend down — generate OTP locally and show
-        const localOtp = String(Math.floor(100000 + Math.random() * 900000));
-        setOtpSent(true);
-        setDevOtp(localOtp);
-        // Store locally for verification
-        sessionStorage.setItem(`otp_${phone}`, localOtp);
+        setError('Could not send OTP. Please try again.');
       }
-    } finally {
-      setLoading(false);
-    }
+    } finally { setLoading(false); }
   };
 
-  // Verify OTP
   const handleVerifyOtp = async (e) => {
     e.preventDefault();
     if (!otp || otp.length !== 6) { setError('Enter 6-digit OTP.'); return; }
-    setLoading(true);
-    setError('');
-
-    // Check local OTP first (fallback when backend was down)
-    const localOtp = sessionStorage.getItem(`otp_${phone}`);
-    if (localOtp && localOtp === otp) {
-      sessionStorage.removeItem(`otp_${phone}`);
-      // Try backend verify, if fails just go home
-      try {
-        const res = await api.post('auth/otp/verify/', { phone, otp });
-        login(res.data.access, res.data.refresh);
-      } catch {
-        // Backend down but OTP matched locally — still allow
-      }
-      navigate('/');
-      setLoading(false);
-      return;
-    }
-
+    setLoading(true); setError('');
     try {
       const res = await api.post('auth/otp/verify/', { phone, otp });
       login(res.data.access, res.data.refresh);
       navigate('/');
     } catch (err) {
       setError(err.response?.data?.error || 'Invalid or expired OTP.');
-    } finally {
-      setLoading(false);
-    }
+    } finally { setLoading(false); }
   };
 
   return (
@@ -130,23 +86,10 @@ export default function Login() {
             <p className="login-subtitle">Welcome back! Please login to continue.</p>
           </div>
 
-          {/* Tabs */}
           <div style={{ display: 'flex', borderBottom: '2px solid var(--border)', marginBottom: 20 }}>
-            {[
-              { key: 'password', label: '🔐 Password' },
-              { key: 'otp', label: '📱 Phone OTP' },
-            ].map((t) => (
-              <button
-                key={t.key}
-                onClick={() => { setTab(t.key); setError(''); setOtpSent(false); }}
-                style={{
-                  flex: 1, padding: '10px 0', border: 'none', background: 'none',
-                  fontWeight: 700, fontSize: '0.9rem', cursor: 'pointer',
-                  color: tab === t.key ? 'var(--primary)' : 'var(--text3)',
-                  borderBottom: tab === t.key ? '2px solid var(--primary)' : '2px solid transparent',
-                  marginBottom: -2,
-                }}
-              >
+            {[{ key: 'password', label: '🔐 Password' }, { key: 'otp', label: '📱 Phone OTP' }].map((t) => (
+              <button key={t.key} onClick={() => { setTab(t.key); setError(''); setOtpSent(false); }}
+                style={{ flex: 1, padding: '10px 0', border: 'none', background: 'none', fontWeight: 700, fontSize: '0.9rem', cursor: 'pointer', color: tab === t.key ? 'var(--primary)' : 'var(--text3)', borderBottom: tab === t.key ? '2px solid var(--primary)' : '2px solid transparent', marginBottom: -2 }}>
                 {t.label}
               </button>
             ))}
@@ -159,7 +102,6 @@ export default function Login() {
           )}
           {error && <div className="error-message">🔒 {error}</div>}
 
-          {/* Password Tab */}
           {tab === 'password' && (
             <form className="login-form" onSubmit={handleLogin}>
               <div className="form-group">
@@ -171,8 +113,7 @@ export default function Login() {
                 <label className="form-label">Password</label>
                 <div style={{ position: 'relative' }}>
                   <input className="form-input" type={showPassword ? 'text' : 'password'}
-                    placeholder="Enter your password" value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Enter your password" value={password} onChange={(e) => setPassword(e.target.value)}
                     autoComplete="current-password" style={{ paddingRight: 44 }} required />
                   <button type="button" onClick={() => setShowPassword(!showPassword)}
                     style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.1rem' }}>
@@ -186,9 +127,7 @@ export default function Login() {
                     style={{ accentColor: 'var(--primary)', width: 15, height: 15 }} />
                   Remember me
                 </label>
-                <Link to="/forgot-password" style={{ fontSize: '0.88rem', color: 'var(--primary)', textDecoration: 'none' }}>
-                  Forgot password?
-                </Link>
+                <Link to="/forgot-password" style={{ fontSize: '0.88rem', color: 'var(--primary)', textDecoration: 'none' }}>Forgot password?</Link>
               </div>
               <button type="submit" className="login-button" disabled={loading}>
                 {loading ? '⏳ Logging in...' : 'Login'}
@@ -196,7 +135,6 @@ export default function Login() {
             </form>
           )}
 
-          {/* OTP Tab */}
           {tab === 'otp' && (
             <form className="login-form" onSubmit={otpSent ? handleVerifyOtp : handleSendOtp}>
               <div className="form-group">
@@ -208,7 +146,6 @@ export default function Login() {
                     maxLength={10} disabled={otpSent} required style={{ flex: 1 }} />
                 </div>
               </div>
-
               {otpSent && (
                 <>
                   <div className="form-group">
@@ -218,13 +155,12 @@ export default function Login() {
                       maxLength={6} autoFocus required
                       style={{ letterSpacing: 8, fontSize: '1.3rem', textAlign: 'center', fontWeight: 700 }} />
                   </div>
-                  <button type="button" onClick={() => { setOtpSent(false); setOtp(''); setDevOtp(''); }}
+                  <button type="button" onClick={() => { setOtpSent(false); setOtp(''); }}
                     style={{ background: 'none', border: 'none', color: 'var(--primary)', cursor: 'pointer', fontSize: '0.85rem', marginBottom: 12 }}>
                     ← Change number
                   </button>
                 </>
               )}
-
               <button type="submit" className="login-button" disabled={loading}>
                 {loading ? '⏳ Please wait...' : otpSent ? 'Verify OTP' : 'Send OTP'}
               </button>
@@ -232,9 +168,7 @@ export default function Login() {
           )}
 
           <div className="login-footer">
-            <p className="signup-text">
-              Don't have an account? <Link to="/register" className="signup-link">Sign Up</Link>
-            </p>
+            <p className="signup-text">Don't have an account? <Link to="/register" className="signup-link">Sign Up</Link></p>
           </div>
         </div>
       </div>
