@@ -713,7 +713,12 @@ class ReferralView(APIView):
 
     def get(self, request):
         """Get my referral code (username-based)"""
-        code = f"REF{request.user.username.upper()}"
+        username = request.user.username
+        # Clean up phone-based usernames
+        if username.startswith('phone_'):
+            code = f"REF{username[6:]}"  # REF + phone number
+        else:
+            code = f"REF{username.upper()}"
         count = Referral.objects.filter(referrer=request.user).count()
         return Response({'code': code, 'referrals': count, 'bonus_per_referral': 100})
 
