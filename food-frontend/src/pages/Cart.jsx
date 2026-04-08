@@ -3,8 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { CartContext } from '../context/CartContext';
 import { useNotification } from '../context/NotificationContext';
 import api from '../api/api';
-
-const BACKEND = 'http://127.0.0.1:8000';
+import BACKEND from '../config';
 const GST = 0.18;
 
 const FALLBACKS = {

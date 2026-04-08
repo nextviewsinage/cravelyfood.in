@@ -3,8 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { CartContext } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import api from '../api';
-
-const BACKEND = 'http://127.0.0.1:8000';
+import BACKEND from '../config';
 const FOOD_IMGS = [
   'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&h=250&fit=crop',
   'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400&h=250&fit=crop',

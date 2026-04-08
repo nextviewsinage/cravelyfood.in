@@ -4,8 +4,18 @@ import { useAuth } from '../context/AuthContext';
 import { useNotification } from '../context/NotificationContext';
 import api from '../api/api';
 
-const BACKEND = 'http://127.0.0.1:8000';
-const FALLBACK = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&h=250&fit=crop';
+const BACKEND = process.env.NODE_ENV === 'development'
+  ? 'http://127.0.0.1:8000'
+  : (process.env.REACT_APP_API_URL || 'https://cravelyfood-in.onrender.com');
+
+const FALLBACKS = [
+  'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&h=250&fit=crop',
+  'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400&h=250&fit=crop',
+  'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&h=250&fit=crop',
+  'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400&h=250&fit=crop',
+  'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400&h=250&fit=crop',
+];
+const FALLBACK = FALLBACKS[0];
 
 export default function Wishlist() {
   const { isLoggedIn } = useAuth();

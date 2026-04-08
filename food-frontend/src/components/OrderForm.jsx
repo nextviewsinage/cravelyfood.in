@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import api from '../api/api';
 
 function OrderForm() {
   const [foods, setFoods] = useState([]);
@@ -11,22 +12,14 @@ function OrderForm() {
   });
 
   useEffect(() => {
-    fetch("http://127.0.0.1:8000/api/foods/")
-      .then((res) => {
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        return res.json();
-      })
-      .then((data) => setFoods(data))
+    api.get('foods/')
+      .then((res) => setFoods(res.data))
       .catch((err) => console.error("Failed to load foods:", err));
   }, []);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    fetch("http://127.0.0.1:8000/api/orders/", {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(form),
-    })
+    api.post('orders/', form)
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return res.json();

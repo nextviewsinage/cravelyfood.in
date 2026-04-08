@@ -2,8 +2,7 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNotification } from '../context/NotificationContext';
 import api from '../api/api';
-
-const BACKEND = 'http://127.0.0.1:8000';
+import BACKEND from '../config';
 
 function StarPicker({ value, onChange }) {
   return (

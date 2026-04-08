@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import api from '../api';
+import BACKEND from '../config';
 
 const REST_FALLBACKS = [
   'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=600&h=300&fit=crop',
@@ -9,7 +10,6 @@ const REST_FALLBACKS = [
   'https://images.unsplash.com/photo-1466978913421-dad2ebd01d17?w=600&h=300&fit=crop',
   'https://images.unsplash.com/photo-1537047902294-62a40c20a6ae?w=600&h=300&fit=crop',
 ];
-const BACKEND = 'http://127.0.0.1:8000';
 const CUISINE_IMGS = {
   burger:  'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600&h=300&fit=crop',
   pizza:   'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=600&h=300&fit=crop',

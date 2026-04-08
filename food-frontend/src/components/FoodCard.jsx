@@ -2,8 +2,7 @@ import { useContext } from 'react';
 import { CartContext } from '../context/CartContext';
 import { useNotification } from '../context/NotificationContext';
 import WishlistButton from './WishlistButton';
-
-const BACKEND = 'http://127.0.0.1:8000';
+import BACKEND from '../config';
 
 // ── Category-level fallback images ──────────────────────────────────────────
 const CAT_IMAGES = {

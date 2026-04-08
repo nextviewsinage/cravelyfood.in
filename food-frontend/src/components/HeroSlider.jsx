@@ -1,8 +1,7 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api/api';
-
-const BACKEND = 'http://127.0.0.1:8000';
+import BACKEND from '../config';
 
 const FALLBACK_IMAGES = [
   'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=1400&h=500&fit=crop',
