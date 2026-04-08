@@ -69,30 +69,35 @@ class SendOTPView(APIView):
         if not phone or len(phone) < 10:
             return Response({'error': 'Valid phone number required'}, status=400)
 
-        import random, os, requests as req
+        import random, os
         from .models import PhoneOTP
 
         PhoneOTP.objects.filter(phone=phone).delete()
         otp = str(random.randint(100000, 999999))
         PhoneOTP.objects.create(phone=phone, otp=otp)
 
-        # Send via Fast2SMS
-        api_key = os.environ.get('FAST2SMS_API_KEY', '')
-        sms_sent = False
-        if api_key:
-            try:
-                resp = req.post(
-                    'https://www.fast2sms.com/dev/bulkV2',
-                    headers={'authorization': api_key},
-                    json={'route': 'q', 'message': f'Your Cravely OTP is {otp}. Valid 10 min.', 'language': 'english', 'flash': 0, 'numbers': phone},
-                    timeout=8
-                )
-                if resp.json().get('return'):
-                    sms_sent = True
-            except Exception:
-                pass
+        # Twilio SMS
+        account_sid = os.environ.get('TWILIO_ACCOUNT_SID', '')
+        auth_token = os.environ.get('TWILIO_AUTH_TOKEN', '')
+        twilio_number = os.environ.get('TWILIO_PHONE_NUMBER', '')
 
-        resp_data = {'message': f'OTP sent to +91{phone}', 'dev_otp': otp}
+        sms_sent = False
+        if twilio_number:
+            try:
+                from twilio.rest import Client
+                client = Client(account_sid, auth_token)
+                client.messages.create(
+                    body=f'Your Cravely OTP is {otp}. Valid for 10 minutes.',
+                    from_=twilio_number,
+                    to=f'+91{phone}'
+                )
+                sms_sent = True
+            except Exception as e:
+                print(f'Twilio error: {e}')
+
+        resp_data = {'message': f'OTP sent to +91{phone}'}
+        if not sms_sent:
+            resp_data['dev_otp'] = otp
         return Response(resp_data)
 
 
