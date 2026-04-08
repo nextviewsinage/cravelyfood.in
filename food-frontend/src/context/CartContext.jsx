@@ -7,11 +7,14 @@ export const CartProvider = ({ children }) => {
   const [appliedCoupon, setAppliedCoupon] = useState(null); // { code, discount }
 
   const addToCart = (item) => {
+    // Use dynamic (surge) price if active, otherwise base price
+    const effectivePrice = item.surge_active ? (item.dynamic_price ?? item.price) : item.price;
+    const cartItem = { ...item, price: effectivePrice, original_price: item.price };
     const exists = cart.find((i) => i.id === item.id);
     if (exists) {
       setCart(cart.map((i) => i.id === item.id ? { ...i, qty: i.qty + 1 } : i));
     } else {
-      setCart([...cart, { ...item, qty: 1 }]);
+      setCart([...cart, { ...cartItem, qty: 1 }]);
     }
   };
 

@@ -877,6 +877,19 @@ class DeliveryETAView(APIView):
         })
 
 
+# ── SURGE PRICING ─────────────────────────────────────
+class SurgePricingView(APIView):
+    """Returns current surge info so the frontend can show a banner."""
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request):
+        from .dynamic_pricing import get_surge_info
+        surge = get_surge_info(request)
+        if surge:
+            return Response(surge)
+        return Response({'active': False, 'multiplier': 1.0, 'label': None, 'emoji': None, 'reason': None})
+
+
 # ── DYNAMIC OFFERS ────────────────────────────────────
 class DynamicOfferView(APIView):
     permission_classes = [permissions.AllowAny]

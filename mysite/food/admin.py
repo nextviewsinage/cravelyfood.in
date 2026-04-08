@@ -3,7 +3,7 @@ from .models import (
     Category, FoodItem, Order, Restaurant, Review,
     DeliveryBoy, LoyaltyAccount, Subscription, FlashDeal,
     Referral, GroupOrder, GroupOrderItem, PushCampaign, Coupon,
-    Wishlist, ReviewImage,
+    Wishlist, ReviewImage, SurgePricingRule,
 )
 
 
@@ -138,3 +138,10 @@ class HeroSlideAdmin(admin.ModelAdmin):
             'fields': ('order', 'is_active', 'expires_at')
         }),
     )
+
+@admin.register(SurgePricingRule)
+class SurgePricingRuleAdmin(admin.ModelAdmin):
+    list_display = ['name', 'trigger', 'multiplier', 'label', 'is_active', 'priority']
+    list_editable = ['multiplier', 'is_active', 'priority']
+    list_filter = ['trigger', 'is_active']
+    ordering = ['priority']

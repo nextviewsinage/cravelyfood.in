@@ -18,6 +18,7 @@ from .views import (
     ImageSearchView, BadgeListView, UserBadgeView, LeaderboardView, VoiceSearchView,
     ContactMessageView, SmartComboView, WhatsAppMenuView,
     HeroSlideViewSet,
+    SurgePricingView,
 )
 
 router = DefaultRouter()
@@ -60,6 +61,7 @@ urlpatterns = [
     path('referral/', ReferralView.as_view(), name='referral'),
     path('delivery/eta/', DeliveryETAView.as_view(), name='delivery_eta'),
     path('offers/dynamic/', DynamicOfferView.as_view(), name='dynamic_offer'),
+    path('pricing/surge/', SurgePricingView.as_view(), name='surge_pricing'),
     path('campaigns/', PushCampaignView.as_view(), name='push_campaigns'),
     path('badges/', BadgeListView.as_view(), name='badges'),
     path('badges/mine/', UserBadgeView.as_view(), name='user_badges'),

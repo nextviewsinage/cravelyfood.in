@@ -144,6 +144,11 @@ class FoodItemSerializer(serializers.ModelSerializer):
     avg_rating = serializers.SerializerMethodField()
     review_count = serializers.SerializerMethodField()
     image = serializers.SerializerMethodField()
+    # Dynamic pricing fields
+    dynamic_price = serializers.SerializerMethodField()
+    surge_active = serializers.SerializerMethodField()
+    surge_label = serializers.SerializerMethodField()
+    surge_emoji = serializers.SerializerMethodField()
 
     class Meta:
         model = FoodItem
@@ -153,7 +158,16 @@ class FoodItemSerializer(serializers.ModelSerializer):
             'category', 'category_name',
             'restaurant', 'restaurant_name',
             'image', 'avg_rating', 'review_count',
+            'dynamic_price', 'surge_active', 'surge_label', 'surge_emoji',
         ]
+
+    def _surge(self):
+        """Cache surge info per serializer instance."""
+        if not hasattr(self, '_surge_cache'):
+            from .dynamic_pricing import get_surge_info
+            request = self.context.get('request')
+            self._surge_cache = get_surge_info(request)
+        return self._surge_cache
 
     def get_category_name(self, obj):
         return obj.category.name if obj.category else None
@@ -174,6 +188,23 @@ class FoodItemSerializer(serializers.ModelSerializer):
 
     def get_review_count(self, obj):
         return obj.reviews.count()
+
+    def get_dynamic_price(self, obj):
+        surge = self._surge()
+        if surge:
+            return round(float(obj.price) * surge['multiplier'], 2)
+        return float(obj.price)
+
+    def get_surge_active(self, obj):
+        return self._surge() is not None
+
+    def get_surge_label(self, obj):
+        surge = self._surge()
+        return surge['label'] if surge else None
+
+    def get_surge_emoji(self, obj):
+        surge = self._surge()
+        return surge['emoji'] if surge else None
 
 
 # ── COUPON ────────────────────────────────────────────

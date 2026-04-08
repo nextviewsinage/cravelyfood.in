@@ -196,7 +196,23 @@ export default function FoodCard({ food = {} }) {
         <div className="food-name">{food.name || 'Food Item'}</div>
         <div className="food-description">{food.description || 'Delicious food item'}</div>
         <div className="food-footer">
-          <span className="food-price">₹{food.price ?? '—'}</span>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            {food.surge_active ? (
+              <>
+                <span className="food-price" style={{ color: '#ff5200' }}>
+                  {food.surge_emoji} ₹{food.dynamic_price ?? food.price}
+                </span>
+                <span style={{
+                  fontSize: '0.72rem', color: '#999',
+                  textDecoration: 'line-through', lineHeight: 1,
+                }}>
+                  ₹{food.price}
+                </span>
+              </>
+            ) : (
+              <span className="food-price">₹{food.price ?? '—'}</span>
+            )}
+          </div>
           <button className="add-btn" onClick={handleAdd}>+ Add</button>
         </div>
       </div>

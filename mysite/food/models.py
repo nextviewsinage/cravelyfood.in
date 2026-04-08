@@ -480,3 +480,44 @@ class PhoneOTP(models.Model):
 
     def __str__(self):
         return f"{self.phone} — {self.otp}"
+
+
+# ── DYNAMIC / SURGE PRICING ───────────────────────────
+class SurgePricingRule(models.Model):
+    """
+    Admin-configurable surge rules.
+    Rules are evaluated in priority order; first match wins.
+    """
+    TRIGGER_CHOICES = [
+        ('peak_lunch',   'Peak Lunch (12–2 PM)'),
+        ('peak_dinner',  'Peak Dinner (7–10 PM)'),
+        ('late_night',   'Late Night (11 PM–5 AM)'),
+        ('weekend',      'Weekend'),
+        ('rain',         'Rainy Weather'),
+        ('high_demand',  'High Demand (orders/hr)'),
+        ('custom_time',  'Custom Time Window'),
+    ]
+    name = models.CharField(max_length=100)
+    trigger = models.CharField(max_length=20, choices=TRIGGER_CHOICES)
+    multiplier = models.DecimalField(
+        max_digits=4, decimal_places=2, default=1.20,
+        help_text='e.g. 1.20 = 20% surge, 1.50 = 50% surge'
+    )
+    label = models.CharField(max_length=80, default='Surge Pricing Active',
+                             help_text='Shown to user, e.g. "🌧️ Rain Surge +20%"')
+    emoji = models.CharField(max_length=5, default='⚡')
+    # For custom_time trigger
+    start_hour = models.PositiveSmallIntegerField(null=True, blank=True, help_text='0–23')
+    end_hour = models.PositiveSmallIntegerField(null=True, blank=True, help_text='0–23')
+    # For high_demand trigger
+    demand_threshold = models.PositiveIntegerField(default=50,
+                                                    help_text='Orders per hour to trigger')
+    is_active = models.BooleanField(default=True)
+    priority = models.PositiveSmallIntegerField(default=10,
+                                                help_text='Lower = evaluated first')
+
+    class Meta:
+        ordering = ['priority']
+
+    def __str__(self):
+        return f"{self.emoji} {self.name} (×{self.multiplier})"

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Navbar from '../components/Navbar';
 import FoodList from '../components/FoodList';
+import SurgeBanner from '../components/SurgeBanner';
 import api from '../api';
 
 export default function Foods() {
@@ -39,6 +40,7 @@ export default function Foods() {
     <div>
       <Navbar />
       <div style={{ padding: 16 }}>
+        <SurgeBanner />
         <h1>All Foods</h1>
         {loading && <p>Loading...</p>}
         {error && <p style={{ color: 'red' }}>⚠️ Error: {error}</p>}

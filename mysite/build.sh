@@ -6,4 +6,5 @@ python manage.py migrate --no-input
 python manage.py seed_all
 python manage.py remove_nonveg
 python manage.py setup_production
+python manage.py seed_surge_rules
 python manage.py collectstatic --no-input --clear 2>/dev/null || true
