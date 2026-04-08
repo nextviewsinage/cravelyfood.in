@@ -94,10 +94,11 @@ class SendOTPView(APIView):
             except Exception as e:
                 print(f'Twilio error: {e}')
 
-        resp_data = {'message': f'OTP sent to +91{phone}'}
-        if not sms_sent:
-            resp_data['dev_otp'] = otp
-        return Response(resp_data)
+        if sms_sent:
+            return Response({'message': f'OTP sent to +91{phone}'})
+        else:
+            # Fallback: return OTP in response (remove in production)
+            return Response({'message': f'OTP sent to +91{phone}', 'dev_otp': otp})
 
 
 class VerifyOTPView(APIView):

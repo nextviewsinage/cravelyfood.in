@@ -218,11 +218,6 @@ export default function Login() {
                       maxLength={6} autoFocus required
                       style={{ letterSpacing: 8, fontSize: '1.3rem', textAlign: 'center', fontWeight: 700 }} />
                   </div>
-                  {devOtp && (
-                    <div style={{ background: '#fff8e1', border: '1px solid #ffd54f', borderRadius: 8, padding: '8px 12px', marginBottom: 12, fontSize: '0.82rem', color: '#795548' }}>
-                      🔧 Demo OTP: <strong>{devOtp}</strong> (SMS service not configured)
-                    </div>
-                  )}
                   <button type="button" onClick={() => { setOtpSent(false); setOtp(''); setDevOtp(''); }}
                     style={{ background: 'none', border: 'none', color: 'var(--primary)', cursor: 'pointer', fontSize: '0.85rem', marginBottom: 12 }}>
                     ← Change number
