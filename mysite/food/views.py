@@ -76,20 +76,19 @@ class SendOTPView(APIView):
         otp = str(random.randint(100000, 999999))
         PhoneOTP.objects.create(phone=phone, otp=otp)
 
-        # Twilio SMS
+        # Twilio Verify SMS
         account_sid = os.environ.get('TWILIO_ACCOUNT_SID', '')
         auth_token = os.environ.get('TWILIO_AUTH_TOKEN', '')
-        twilio_number = os.environ.get('TWILIO_PHONE_NUMBER', '')
+        verify_sid = os.environ.get('TWILIO_VERIFY_SID', '')
 
         sms_sent = False
-        if twilio_number:
+        if account_sid and auth_token and verify_sid:
             try:
                 from twilio.rest import Client
                 client = Client(account_sid, auth_token)
-                client.messages.create(
-                    body=f'Your Cravely OTP is {otp}. Valid for 10 minutes.',
-                    from_=twilio_number,
-                    to=f'+91{phone}'
+                client.verify.v2.services(verify_sid).verifications.create(
+                    to=f'+91{phone}',
+                    channel='sms'
                 )
                 sms_sent = True
             except Exception as e:
@@ -108,15 +107,37 @@ class VerifyOTPView(APIView):
         phone = request.data.get('phone', '').strip()
         otp = request.data.get('otp', '').strip()
 
-        from .models import PhoneOTP
+        import os
         from rest_framework_simplejwt.tokens import RefreshToken
 
-        record = PhoneOTP.objects.filter(phone=phone, otp=otp).last()
-        if not record or not record.is_valid():
-            return Response({'error': 'Invalid or expired OTP'}, status=400)
+        account_sid = os.environ.get('TWILIO_ACCOUNT_SID', '')
+        auth_token = os.environ.get('TWILIO_AUTH_TOKEN', '')
+        verify_sid = os.environ.get('TWILIO_VERIFY_SID', '')
 
-        record.is_used = True
-        record.save()
+        verified = False
+        if account_sid and auth_token and verify_sid:
+            try:
+                from twilio.rest import Client
+                client = Client(account_sid, auth_token)
+                result = client.verify.v2.services(verify_sid).verification_checks.create(
+                    to=f'+91{phone}',
+                    code=otp
+                )
+                verified = result.status == 'approved'
+            except Exception as e:
+                print(f'Twilio verify error: {e}')
+
+        # Fallback: check local DB OTP
+        if not verified:
+            from .models import PhoneOTP
+            record = PhoneOTP.objects.filter(phone=phone, otp=otp).last()
+            if record and record.is_valid():
+                record.is_used = True
+                record.save()
+                verified = True
+
+        if not verified:
+            return Response({'error': 'Invalid or expired OTP'}, status=400)
 
         # Find or create user by phone
         user = User.objects.filter(username=f'phone_{phone}').first()
@@ -128,7 +149,6 @@ class VerifyOTPView(APIView):
             from .models import UserProfile
             UserProfile.objects.get_or_create(user=user, defaults={'phone': phone, 'role': 'customer'})
         else:
-            # Update phone in profile
             try:
                 user.profile.phone = phone
                 user.profile.save()
@@ -136,7 +156,6 @@ class VerifyOTPView(APIView):
                 pass
 
         refresh = RefreshToken.for_user(user)
-        # Add role to token
         try:
             refresh['role'] = user.profile.role
         except Exception:
@@ -144,6 +163,10 @@ class VerifyOTPView(APIView):
         refresh['username'] = user.username
 
         return Response({
+            'access': str(refresh.access_token),
+            'refresh': str(refresh),
+            'username': user.username,
+        })
             'access': str(refresh.access_token),
             'refresh': str(refresh),
             'username': user.username,
