@@ -167,10 +167,6 @@ class VerifyOTPView(APIView):
             'refresh': str(refresh),
             'username': user.username,
         })
-            'access': str(refresh.access_token),
-            'refresh': str(refresh),
-            'username': user.username,
-        })
 
 
 class ProfileView(generics.RetrieveAPIView):
