@@ -48,12 +48,13 @@ export default function AdminDashboard() {
   const maxRevenue = Math.max(...(analytics?.daily_sales?.map((d) => d.revenue) || [1]));
 
   const STATS = [
-    { icon: '📦', label: 'Total Orders',   value: data.total_orders,                          cls: 'orange' },
-    { icon: '💰', label: 'Total Revenue',  value: `₹${data.total_revenue.toLocaleString()}`,  cls: 'green'  },
-    { icon: '⏳', label: 'Pending Orders', value: data.pending_orders,                         cls: 'yellow' },
-    { icon: '✅', label: 'Delivered',      value: data.delivered_orders,                       cls: 'blue'   },
-    { icon: '👥', label: 'Total Users',    value: data.total_users,                            cls: 'purple' },
-    { icon: '🍔', label: 'Food Items',     value: data.total_foods,                            cls: 'pink'   },
+    { icon: '📦', label: 'Total Orders',      value: data.total_orders,                          cls: 'orange' },
+    { icon: '💰', label: 'Total Revenue',     value: `₹${data.total_revenue.toLocaleString()}`,  cls: 'green'  },
+    { icon: '⏳', label: 'Pending Orders',    value: data.pending_orders,                         cls: 'yellow' },
+    { icon: '✅', label: 'Delivered',         value: data.delivered_orders,                       cls: 'blue'   },
+    { icon: '👥', label: 'Total Users',       value: data.total_users,                            cls: 'purple' },
+    { icon: '🍔', label: 'Food Items',        value: data.total_foods,                            cls: 'pink'   },
+    { icon: '🛵', label: 'Delivery Partners', value: data.delivery_boys?.length ?? 0,             cls: 'orange' },
   ];
 
   return (
@@ -122,6 +123,56 @@ export default function AdminDashboard() {
             </div>
           </div>
         </div>
+
+        {/* ── DELIVERY BOYS ── */}
+        {data.delivery_boys?.length > 0 && (
+          <div className="admin-panel">
+            <div className="admin-panel-title">🛵 Delivery Partners ({data.delivery_boys.length})</div>
+            <div className="admin-table-wrap">
+              <table className="admin-table">
+                <thead>
+                  <tr>
+                    {['#', 'Name', 'Phone', 'Vehicle', 'Status', 'Active Orders', 'Total Delivered'].map(h => (
+                      <th key={h}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {data.delivery_boys.map((db, i) => (
+                    <tr key={db.id}>
+                      <td className="admin-td-rank">{i + 1}</td>
+                      <td className="admin-td-name">👤 {db.username}</td>
+                      <td style={{ padding: '10px 12px', fontSize: '0.85rem' }}>📞 {db.phone || '—'}</td>
+                      <td style={{ padding: '10px 12px', fontSize: '0.85rem' }}>🚗 {db.vehicle || '—'}</td>
+                      <td style={{ padding: '10px 12px' }}>
+                        <span style={{
+                          background: db.is_available ? '#e8f5e9' : '#fdecea',
+                          color: db.is_available ? '#2e7d32' : '#c62828',
+                          padding: '3px 10px', borderRadius: 20,
+                          fontSize: '0.78rem', fontWeight: 700,
+                        }}>
+                          {db.is_available ? '🟢 Available' : '🔴 Busy'}
+                        </span>
+                      </td>
+                      <td style={{ padding: '10px 12px', textAlign: 'center', fontWeight: 700, color: '#ff5200' }}>
+                        {db.active_orders}
+                      </td>
+                      <td style={{ padding: '10px 12px', textAlign: 'center', fontWeight: 700, color: '#2e7d32' }}>
+                        {db.total_delivered}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {data.delivery_boys?.length === 0 && (
+          <div className="admin-panel" style={{ textAlign: 'center', color: '#aaa', padding: 32 }}>
+            🛵 No delivery partners registered yet
+          </div>
+        )}
 
         {/* ── DAILY SALES CHART ── */}
         {analytics?.daily_sales?.length > 0 && (

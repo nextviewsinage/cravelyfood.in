@@ -458,6 +458,24 @@ class AdminDashboardView(APIView):
             Order.objects.order_by('-created_at')[:5], many=True
         ).data
 
+        # Delivery boys
+        delivery_boys = DeliveryBoy.objects.select_related('user').annotate(
+            total_delivered=Count('assigned_orders', filter=Q(assigned_orders__status='Delivered')),
+            active_orders=Count('assigned_orders', filter=Q(assigned_orders__status__in=['On the way', 'Preparing', 'Confirmed'])),
+        )
+        delivery_boys_data = [
+            {
+                'id': db.id,
+                'username': db.user.username,
+                'phone': db.phone,
+                'vehicle': db.vehicle_number,
+                'is_available': db.is_available,
+                'total_delivered': db.total_delivered,
+                'active_orders': db.active_orders,
+            }
+            for db in delivery_boys
+        ]
+
         return Response({
             'total_orders': total_orders,
             'total_revenue': round(float(total_revenue), 2),
@@ -467,6 +485,7 @@ class AdminDashboardView(APIView):
             'total_foods': total_foods,
             'popular_foods': list(popular),
             'recent_orders': recent_orders,
+            'delivery_boys': delivery_boys_data,
         })
 
 
