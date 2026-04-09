@@ -3,10 +3,10 @@ from food.models import SurgePricingRule
 
 
 RULES = [
-    # Always-active demo rule — priority 0 = first evaluated, full day 0–23
+    # Always-active demo rule — DISABLED, real rules handle timing
     dict(name='Always Active Demo', trigger='custom_time', multiplier=1.20,
          label='⚡ Surge Pricing Active +20%', emoji='⚡',
-         start_hour=0, end_hour=23, is_active=True, priority=0),
+         start_hour=0, end_hour=23, is_active=False, priority=0),
     dict(name='Peak Lunch Rush',  trigger='peak_lunch',   multiplier=1.20,
          label='🍽️ Lunch Rush — Surge +20%',   emoji='🍽️', is_active=True, priority=1),
     dict(name='Peak Dinner Rush', trigger='peak_dinner',  multiplier=1.25,
