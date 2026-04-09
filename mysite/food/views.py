@@ -882,6 +882,192 @@ class DeliveryETAView(APIView):
         })
 
 
+# ── PREDICTIVE ORDERING (AI) ──────────────────────────
+class PredictiveOrderingView(APIView):
+    """
+    GET /ai/predictive/
+    Analyzes user's order history and returns:
+    - Personalized insight messages ("You usually order pizza on Fridays 🍕")
+    - Predicted food suggestions based on patterns
+    - Deal-boosted items (flash deals on predicted items)
+    """
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        from collections import Counter
+        from django.utils import timezone
+
+        user = request.user
+        now = timezone.localtime()
+        today_name = now.strftime('%A')   # e.g. "Friday"
+        today_num  = now.weekday()        # 0=Mon … 6=Sun
+        hour       = now.hour
+
+        # ── Fetch last 60 orders ──────────────────────
+        orders = (
+            Order.objects
+            .filter(user=user, status='Delivered')
+            .select_related('food_item__category')
+            .order_by('-created_at')[:60]
+        )
+
+        if not orders:
+            # Cold start — return time-based popular items
+            return self._cold_start(hour)
+
+        # ── Pattern analysis ──────────────────────────
+        day_items   = Counter()   # (weekday, food_id) → count
+        cat_counts  = Counter()   # category_name → count
+        item_counts = Counter()   # food_id → count
+        item_names  = {}          # food_id → name
+        item_objs   = {}          # food_id → FoodItem
+
+        for o in orders:
+            fi = o.food_item
+            day = o.created_at.weekday()
+            day_items[(day, fi.id)] += 1
+            cat_counts[fi.category.name if fi.category else 'General'] += 1
+            item_counts[fi.id] += 1
+            item_names[fi.id] = fi.name
+            item_objs[fi.id] = fi
+
+        # ── Build insight messages ────────────────────
+        insights = []
+        DAY_NAMES = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']
+
+        # Top item on today's weekday
+        today_top = sorted(
+            [(cnt, fid) for (day, fid), cnt in day_items.items() if day == today_num],
+            reverse=True
+        )
+        if today_top:
+            top_cnt, top_fid = today_top[0]
+            if top_cnt >= 2:
+                insights.append({
+                    'type': 'habit',
+                    'message': f"You usually order {item_names[top_fid]} on {today_name}s 🍽️",
+                    'food_id': top_fid,
+                })
+
+        # Most ordered item overall
+        if item_counts:
+            fav_id, fav_cnt = item_counts.most_common(1)[0]
+            if fav_cnt >= 3:
+                insights.append({
+                    'type': 'favourite',
+                    'message': f"Your all-time favourite: {item_names[fav_id]} ❤️ (ordered {fav_cnt}x)",
+                    'food_id': fav_id,
+                })
+
+        # Top category
+        if cat_counts:
+            fav_cat, cat_cnt = cat_counts.most_common(1)[0]
+            if cat_cnt >= 2:
+                insights.append({
+                    'type': 'category',
+                    'message': f"You love {fav_cat} — here are today's best picks 🤩",
+                    'category': fav_cat,
+                })
+
+        # Time-based nudge
+        time_nudge = self._time_nudge(hour)
+        if time_nudge:
+            insights.append(time_nudge)
+
+        # ── Build food suggestions ────────────────────
+        suggested_ids = set()
+
+        # 1. Today's habit items
+        for _, fid in today_top[:3]:
+            suggested_ids.add(fid)
+
+        # 2. Top overall items
+        for fid, _ in item_counts.most_common(5):
+            suggested_ids.add(fid)
+
+        # 3. Top category items (new items user hasn't tried)
+        if cat_counts:
+            top_cat = cat_counts.most_common(1)[0][0]
+            cat_foods = FoodItem.objects.filter(
+                available=True,
+                category__name=top_cat
+            ).exclude(id__in=item_counts.keys())[:4]
+            for f in cat_foods:
+                suggested_ids.add(f.id)
+
+        # Fetch all suggested food items
+        foods = FoodItem.objects.filter(
+            id__in=suggested_ids, available=True
+        ).select_related('category', 'restaurant')[:8]
+
+        # ── Flash deal boost ──────────────────────────
+        now_utc = timezone.now()
+        live_deals = {
+            fd.food_item_id: fd.discount_percent
+            for fd in FlashDeal.objects.filter(
+                is_active=True,
+                starts_at__lte=now_utc,
+                ends_at__gte=now_utc,
+                food_item_id__in=suggested_ids,
+            )
+        }
+
+        foods_data = FoodItemSerializer(foods, many=True, context={'request': request}).data
+        for f in foods_data:
+            if f['id'] in live_deals:
+                f['deal_discount'] = live_deals[f['id']]
+                f['deal_label'] = f"🔥 {live_deals[f['id']]}% OFF today!"
+
+        # ── Reorder suggestions (deals first) ─────────
+        foods_data = sorted(
+            foods_data,
+            key=lambda f: (-(f.get('deal_discount') or 0), -item_counts.get(f['id'], 0))
+        )
+
+        return Response({
+            'insights': insights,
+            'suggestions': foods_data,
+            'based_on': len(orders),
+        })
+
+    def _cold_start(self, hour):
+        """No order history — return popular time-based items."""
+        if 6 <= hour < 11:
+            cats = ['Indian Breakfast', 'Light Breakfast', 'Tea', 'Coffee']
+            msg = "Good morning! Start your day right ☀️"
+        elif 11 <= hour < 15:
+            cats = ['Biryani', 'Thali', 'North Indian', 'South Indian']
+            msg = "Lunch time! Here are today's top picks 🍛"
+        elif 15 <= hour < 18:
+            cats = ['Snacks', 'Fast Food', 'Street Food', 'Cold Drinks']
+            msg = "Evening snack time! 🍟"
+        else:
+            cats = ['Pizza', 'Biryani', 'Chicken Items', 'Burgers']
+            msg = "Dinner time! What are you craving? 🌙"
+
+        q = Q()
+        for c in cats:
+            q |= Q(category__name__icontains=c)
+        foods = FoodItem.objects.filter(available=True).filter(q)[:8]
+        if foods.count() < 4:
+            foods = FoodItem.objects.filter(available=True).order_by('?')[:8]
+
+        return Response({
+            'insights': [{'type': 'time', 'message': msg}],
+            'suggestions': FoodItemSerializer(foods, many=True).data,
+            'based_on': 0,
+        })
+
+    def _time_nudge(self, hour):
+        if 11 <= hour < 14:
+            return {'type': 'time', 'message': "Lunch rush! Order now for faster delivery 🚀"}
+        if 19 <= hour < 22:
+            return {'type': 'time', 'message': "Dinner time is here — your favourites await 🌆"}
+        if hour >= 23 or hour < 5:
+            return {'type': 'time', 'message': "Late night cravings? We've got you 🌙"}
+        return None
+
+
 # ── HYPERLOCAL BATCH DELIVERY ─────────────────────────
 class BatchOptimizeView(APIView):
     """

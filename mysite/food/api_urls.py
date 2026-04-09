@@ -20,6 +20,7 @@ from .views import (
     HeroSlideViewSet,
     SurgePricingView,
     BatchOptimizeView, AssignBatchView,
+    PredictiveOrderingView,
 )
 
 router = DefaultRouter()
@@ -55,6 +56,7 @@ urlpatterns = [
     path('delivery/update/<int:order_id>/', DeliveryUpdateView.as_view(), name='delivery_update'),
     path('ai/feed/', AIFeedView.as_view(), name='ai_feed'),
     path('ai/mood/', MoodFoodView.as_view(), name='mood_food'),
+    path('ai/predictive/', PredictiveOrderingView.as_view(), name='predictive_ordering'),
     path('ai/image-search/', ImageSearchView.as_view(), name='image_search'),
     path('ai/voice-search/', VoiceSearchView.as_view(), name='voice_search'),
     path('loyalty/', LoyaltyView.as_view(), name='loyalty'),

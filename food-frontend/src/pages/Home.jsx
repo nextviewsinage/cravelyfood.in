@@ -8,6 +8,7 @@ import MoodSelector from '../components/MoodSelector';
 import FlashDeals from '../components/FlashDeals';
 import DynamicOffer from '../components/DynamicOffer';
 import SurgeBanner from '../components/SurgeBanner';
+import PredictiveOrdering from '../components/PredictiveOrdering';
 import SmartETA from '../components/SmartETA';
 import SmartCombo from '../components/SmartCombo';
 import WhatsAppOrder from '../components/WhatsAppOrder';
@@ -123,6 +124,9 @@ export default function Home() {
 
         {/* ── SURGE BANNER ── */}
         <SurgeBanner />
+
+        {/* ── PREDICTIVE ORDERING ── */}
+        <PredictiveOrdering />
 
         {/* ── DYNAMIC OFFER ── */}
         <DynamicOffer />
