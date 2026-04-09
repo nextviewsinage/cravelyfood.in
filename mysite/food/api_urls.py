@@ -19,6 +19,7 @@ from .views import (
     ContactMessageView, SmartComboView, WhatsAppMenuView,
     HeroSlideViewSet,
     SurgePricingView,
+    BatchOptimizeView, AssignBatchView,
 )
 
 router = DefaultRouter()
@@ -60,6 +61,8 @@ urlpatterns = [
     path('subscription/', SubscriptionView.as_view(), name='subscription'),
     path('referral/', ReferralView.as_view(), name='referral'),
     path('delivery/eta/', DeliveryETAView.as_view(), name='delivery_eta'),
+    path('delivery/batch/optimize/', BatchOptimizeView.as_view(), name='batch_optimize'),
+    path('delivery/batch/assign/', AssignBatchView.as_view(), name='batch_assign'),
     path('offers/dynamic/', DynamicOfferView.as_view(), name='dynamic_offer'),
     path('pricing/surge/', SurgePricingView.as_view(), name='surge_pricing'),
     path('campaigns/', PushCampaignView.as_view(), name='push_campaigns'),

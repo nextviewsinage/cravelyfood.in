@@ -93,6 +93,14 @@ class Order(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
     created_at = models.DateTimeField(auto_now_add=True)
     scheduled_at = models.DateTimeField(null=True, blank=True)
+    # Hyperlocal delivery optimization fields
+    delivery_boy = models.ForeignKey(
+        'DeliveryBoy', on_delete=models.SET_NULL,
+        null=True, blank=True, related_name='assigned_orders'
+    )
+    delivery_lat = models.FloatField(null=True, blank=True)
+    delivery_lng = models.FloatField(null=True, blank=True)
+    batch_id = models.CharField(max_length=20, blank=True, default='')
 
     def save(self, *args, **kwargs):
         base = float(self.food_item.price) * self.quantity

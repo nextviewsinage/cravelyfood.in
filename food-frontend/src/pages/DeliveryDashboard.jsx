@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import api from '../api/api';
+import BatchDelivery from '../components/BatchDelivery';
 
 const STATUS_FLOW = ['Pending', 'Confirmed', 'Preparing', 'On the way', 'Delivered'];
 
@@ -156,6 +157,9 @@ export default function DeliveryDashboard() {
 
         {/* Toast */}
         {toast && <div className="dd-toast">{toast}</div>}
+
+        {/* AI Batch Delivery */}
+        <BatchDelivery />
 
         {/* Stats */}
         <div className="dd-stats">

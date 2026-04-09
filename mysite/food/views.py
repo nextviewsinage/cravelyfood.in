@@ -57,7 +57,7 @@ class EmailOrUsernameTokenView(TokenObtainPairView):
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = RegisterSerializer
-    permission_classes = (permissions.AllowAny,)
+    permission_classes = (permissions.AllowAny,)    
 
 
 # ── PHONE OTP LOGIN ───────────────────────────────────
@@ -879,6 +879,61 @@ class DeliveryETAView(APIView):
             'distance_km': distance_km,
             'breakdown': breakdown,
             'pending_orders': pending,
+        })
+
+
+# ── HYPERLOCAL BATCH DELIVERY ─────────────────────────
+class BatchOptimizeView(APIView):
+    """
+    GET /delivery/batch/optimize/?status=Confirmed
+    Returns AI-optimized route for all pending/confirmed orders.
+    Delivery boy or admin only.
+    """
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        from .route_optimizer import build_batch
+        status_filter = request.query_params.get('status', 'Confirmed')
+        origin_lat = float(request.query_params.get('lat', 23.0225))
+        origin_lng = float(request.query_params.get('lng', 72.5714))
+
+        orders = Order.objects.filter(
+            status__in=[status_filter, 'Preparing']
+        ).select_related('food_item', 'delivery_boy').order_by('created_at')[:20]
+
+        if not orders:
+            return Response({'route': [], 'total_orders': 0, 'message': 'No orders to optimize'})
+
+        result = build_batch(list(orders), origin=(origin_lat, origin_lng))
+        return Response(result)
+
+
+class AssignBatchView(APIView):
+    """
+    POST /delivery/batch/assign/
+    Body: { "order_ids": [1,2,3], "batch_id": "ABC123" }
+    Assigns orders to the requesting delivery boy + marks batch_id.
+    """
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        order_ids = request.data.get('order_ids', [])
+        batch_id = request.data.get('batch_id', '')
+
+        try:
+            delivery_boy = request.user.delivery_profile
+        except Exception:
+            return Response({'error': 'Not a registered delivery partner'}, status=403)
+
+        updated = Order.objects.filter(
+            id__in=order_ids,
+            status__in=['Confirmed', 'Preparing', 'Pending']
+        ).update(delivery_boy=delivery_boy, batch_id=batch_id, status='On the way')
+
+        return Response({
+            'assigned': updated,
+            'batch_id': batch_id,
+            'message': f'{updated} orders assigned to you and marked On the way',
         })
 
 
