@@ -11,6 +11,7 @@ export default function Login() {
   const [otpSent, setOtpSent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [devOtp, setDevOtp] = useState(''); // shown when Twilio not configured
   const navigate = useNavigate();
   const { login } = useAuth();
 
@@ -21,11 +22,20 @@ export default function Login() {
     if (!phone || phone.length < 10) { setError('Enter valid 10-digit phone number.'); return; }
     setLoading(true); setError('');
     try {
-      await api.post('auth/otp/send/', { phone });
+      const res = await api.post('auth/otp/send/', { phone });
       setOtpSent(true);
+      // If Twilio not configured, backend returns dev_otp — auto-fill it
+      if (res.data?.dev_otp) {
+        setDevOtp(res.data.dev_otp);
+        setOtp(res.data.dev_otp);
+      }
     } catch (err) {
       if (err.response?.data?.message) {
         setOtpSent(true);
+        if (err.response.data?.dev_otp) {
+          setDevOtp(err.response.data.dev_otp);
+          setOtp(err.response.data.dev_otp);
+        }
       } else {
         setError('Could not send OTP. Please try again.');
       }
@@ -82,7 +92,19 @@ export default function Login() {
                     maxLength={6} autoFocus required
                     style={{ letterSpacing: 8, fontSize: '1.3rem', textAlign: 'center', fontWeight: 700 }} />
                 </div>
-                <button type="button" onClick={() => { setOtpSent(false); setOtp(''); }}
+                {devOtp && (
+                  <div style={{
+                    background: '#fffbeb', border: '1px solid #fcd34d',
+                    borderRadius: 8, padding: '10px 14px', marginBottom: 8,
+                    fontSize: '0.85rem', color: '#92400e', textAlign: 'center',
+                  }}>
+                    🔑 Your OTP: <strong style={{ fontSize: '1.1rem', letterSpacing: 4 }}>{devOtp}</strong>
+                    <div style={{ fontSize: '0.72rem', marginTop: 3, opacity: 0.7 }}>
+                      (SMS not configured — OTP shown here)
+                    </div>
+                  </div>
+                )}
+                <button type="button" onClick={() => { setOtpSent(false); setOtp(''); setDevOtp(''); }}
                   style={{ background: 'none', border: 'none', color: 'var(--primary)', cursor: 'pointer', fontSize: '0.85rem', marginBottom: 12 }}>
                   ← Change number
                 </button>

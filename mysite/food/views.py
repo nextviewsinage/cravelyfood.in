@@ -97,7 +97,8 @@ class SendOTPView(APIView):
         if sms_sent:
             return Response({'message': f'OTP sent to +91{phone}'})
         else:
-            # Fallback: return OTP in response (remove in production)
+            # Twilio not configured — show OTP on screen + log it
+            print(f'[DEV OTP] Phone: +91{phone} | OTP: {otp}')
             return Response({'message': f'OTP sent to +91{phone}', 'dev_otp': otp})
 
 
