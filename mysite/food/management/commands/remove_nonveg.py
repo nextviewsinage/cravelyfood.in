@@ -3,13 +3,19 @@ from food.models import FoodItem, Category
 
 
 class Command(BaseCommand):
-    help = 'Remove all non-veg categories and their food items'
+    help = 'Remove ALL non-veg food items and non-veg categories'
 
     def handle(self, *args, **kwargs):
+        # Delete all food items where is_veg=False
+        deleted_items, _ = FoodItem.objects.filter(is_veg=False).delete()
+
+        # Delete non-veg categories
         non_veg_cats = [
             'Chicken Items', 'Mutton Dishes', 'Fish & Seafood',
-            'Seafood', 'Tandoori Items', 'Kebabs'
+            'Seafood', 'Tandoori Items', 'Kebabs', 'Rolls',
         ]
-        items = FoodItem.objects.filter(category__name__in=non_veg_cats).delete()
-        cats = Category.objects.filter(name__in=non_veg_cats).delete()
-        self.stdout.write(f'Deleted items: {items[0]}, categories: {cats[0]}')
+        deleted_cats, _ = Category.objects.filter(name__in=non_veg_cats).delete()
+
+        self.stdout.write(self.style.SUCCESS(
+            f'✅ Removed {deleted_items} non-veg food items, {deleted_cats} non-veg categories'
+        ))

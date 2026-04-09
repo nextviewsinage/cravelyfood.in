@@ -201,7 +201,7 @@ class Command(BaseCommand):
         deals = [
             ('Margherita Pizza', 40, now, now + timedelta(hours=3)),
             ('Veg Burger', 50, now, now + timedelta(hours=2)),
-            ('Hyderabadi Chicken Biryani', 30, now, now + timedelta(hours=4)),
+            ('Veg Biryani', 30, now, now + timedelta(hours=4)),
             ('Chocolate Brownie', 35, now, now + timedelta(hours=5)),
             ('Masala Dosa', 25, now, now + timedelta(hours=6)),
         ]
