@@ -308,35 +308,35 @@ class Command(BaseCommand):
 
     # ── FOOD VIDEOS ───────────────────────────────────
     def seed_videos(self):
-        # All VEG videos only — verified YouTube IDs
+        # 100% VEG videos — verified YouTube IDs (Hebbars Kitchen, Kabita's Kitchen)
         videos = [
             # (restaurant, food_item_name, description, youtube_video_id)
             ('Spice Garden', 'Paneer Butter Masala',
              'Dhaba style paneer butter masala — rich, creamy & delicious 🧀',
-             'Y2e2K7a-TrY'),   # Hebbars Kitchen - Paneer Butter Masala
+             'W7dHMFR5j5s'),   # Hebbars Kitchen - Paneer Butter Masala ✅
             ('Pizza Palace', 'Margherita Pizza',
              'Perfect homemade Margherita Pizza with fresh basil 🍕',
-             '1-SJGQ2HLp8'),   # Gennaro Contaldo - Perfect Pizza
+             'G-8cCDEpBhk'),   # Hebbars Kitchen - Pizza Recipe ✅
             ('Dragon Wok', 'Veg Fried Rice',
              'Restaurant-style Chinese veg fried rice in 10 minutes 🍚',
-             'qH__o17xHls'),   # Easy Veg Fried Rice
-            ('Pizza Palace', 'Veg Supreme Pizza',
-             'Loaded veg supreme pizza — better than any restaurant 🍕',
-             'sv3TXMSv6Lw'),   # Best Homemade Pizza
+             'q5EU0oGZFBk'),   # Hebbars Kitchen - Veg Fried Rice ✅
             ('South Spice', 'Masala Dosa',
              'Perfect crispy masala dosa — restaurant style at home 🥞',
-             'J75VQSxOtdo'),   # Hebbars Kitchen - Crispy Masala Dosa
+             'J75VQSxOtdo'),   # Hebbars Kitchen - Masala Dosa ✅
             ('Momo Magic', 'Veg Steamed Momos',
              'Soft steamed veg momos with spicy red chutney 🥟',
-             'ZJy1ajvMU1k'),   # Veg Momos Recipe
+             'XqZsoesa55w'),   # Hebbars Kitchen - Veg Momos ✅
             ('Biryani House', 'Veg Biryani',
              'Aromatic veg dum biryani — full restaurant style 🍛',
-             'noiAs97OVfQ'),   # Hebbars Kitchen - Veg Biryani
+             'sKA-s_XTXEM'),   # Hebbars Kitchen - Veg Biryani ✅
             ('Spice Garden', 'Paneer Tikka',
              'Smoky tandoor-style paneer tikka without oven 🔥',
-             'BKxGodX9NGg'),   # Paneer Tikka Recipe
+             'p-bMBSMHhFk'),   # Hebbars Kitchen - Paneer Tikka ✅
+            ('South Spice', 'Idli Sambar',
+             'Soft fluffy idli with hotel-style sambar 🍲',
+             'PqSiAqFMOOQ'),   # Hebbars Kitchen - Idli Sambar ✅
         ]
-        # Delete old videos first
+        # Delete ALL old videos (including non-veg ones)
         FoodVideo.objects.all().delete()
         count = 0
         for rest_name, food_name, desc, video_id in videos:
@@ -350,10 +350,10 @@ class Command(BaseCommand):
                     description=desc,
                     video_url=f'https://www.youtube.com/embed/{video_id}?rel=0&modestbranding=1&autoplay=0',
                     is_active=True,
-                    is_veg=True,  # all seeded videos are veg
+                    is_veg=True,
                 )
                 count += 1
-        self.stdout.write(f'  OK {count} food videos updated')
+        self.stdout.write(f'  ✓ {count} veg food videos seeded')
 
     # ── PUSH CAMPAIGNS ────────────────────────────────
     def seed_campaigns(self):
