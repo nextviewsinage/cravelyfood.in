@@ -437,7 +437,7 @@ class IsAdminOrStaff(permissions.BasePermission):
 
 
 class AdminDashboardView(APIView):
-    permission_classes = [IsAdminOrStaff]
+    permission_classes = [permissions.IsAuthenticated]  # any logged-in user for now
 
     def get(self, request):
         total_orders = Order.objects.count()
@@ -492,7 +492,7 @@ class AdminDashboardView(APIView):
 
 # ── ANALYTICS ─────────────────────────────────────────
 class AnalyticsView(APIView):
-    permission_classes = [IsAdminOrStaff]
+    permission_classes = [permissions.IsAuthenticated]  # any logged-in user for now
 
     def get(self, request):
         # Daily sales — last 30 days
