@@ -56,7 +56,19 @@ function VideoCard({ video, onLike }) {
 
       {/* Info */}
       <div className="reel-info">
-        <div className="reel-title">{video.title}</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+          <div style={{
+            width: 14, height: 14, borderRadius: 3, flexShrink: 0,
+            border: `2px solid ${video.is_veg !== false ? '#48c479' : '#e23744'}`,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>
+            <div style={{
+              width: 7, height: 7, borderRadius: '50%',
+              background: video.is_veg !== false ? '#48c479' : '#e23744',
+            }} />
+          </div>
+          <div className="reel-title">{video.title}</div>
+        </div>
         <div className="reel-meta">
           <span>🏪 {video.restaurant_name}</span>
           {video.food_name && <span>🍽️ {video.food_name}</span>}
@@ -107,10 +119,12 @@ export default function VideoFeed() {
   const [videos, setVideos]   = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter]   = useState('All');
+  const [vegFilter, setVegFilter] = useState('Veg'); // default: Veg only
 
   useEffect(() => {
-    api.get('videos/').then(r => setVideos(r.data)).catch(() => {}).finally(() => setLoading(false));
-  }, []);
+    const param = vegFilter === 'Veg' ? '?veg=true' : vegFilter === 'Non-Veg' ? '?veg=false' : '';
+    api.get(`videos/${param}`).then(r => setVideos(r.data)).catch(() => {}).finally(() => setLoading(false));
+  }, [vegFilter]);
 
   const handleLike = async (id) => {
     try {
@@ -122,6 +136,8 @@ export default function VideoFeed() {
   };
 
   const FILTERS = ['All', 'Most Liked', 'Most Viewed'];
+  const VEG_FILTERS = ['Veg', 'Non-Veg', 'All'];
+
   const sorted = [...videos].sort((a, b) => {
     if (filter === 'Most Liked')  return b.like_count - a.like_count;
     if (filter === 'Most Viewed') return b.views - a.views;
@@ -145,7 +161,27 @@ export default function VideoFeed() {
           💡 Click on a thumbnail to play the video inline. Use "Watch on YouTube" for full screen.
         </div>
 
-        {/* Filter chips */}
+        {/* Veg / Non-Veg toggle */}
+        <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
+          {VEG_FILTERS.map(v => (
+            <button
+              key={v}
+              onClick={() => { setVegFilter(v); setLoading(true); }}
+              style={{
+                padding: '7px 18px',
+                borderRadius: 20,
+                border: `2px solid ${vegFilter === v ? (v === 'Veg' ? '#48c479' : v === 'Non-Veg' ? '#e23744' : '#ff5200') : '#e0e0e0'}`,
+                background: vegFilter === v ? (v === 'Veg' ? '#e8f5e9' : v === 'Non-Veg' ? '#fdecea' : '#fff8f5') : '#fff',
+                color: vegFilter === v ? (v === 'Veg' ? '#2e7d32' : v === 'Non-Veg' ? '#c62828' : '#ff5200') : '#888',
+                fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer',
+              }}
+            >
+              {v === 'Veg' ? '🟢' : v === 'Non-Veg' ? '🔴' : '🍽️'} {v}
+            </button>
+          ))}
+        </div>
+
+        {/* Sort filter chips */}
         <div className="reel-filters">
           {FILTERS.map(f => (
             <button
@@ -165,7 +201,7 @@ export default function VideoFeed() {
         {!loading && videos.length === 0 && (
           <div className="empty-state">
             <div className="empty-state-icon">🎬</div>
-            <h2>No videos yet</h2>
+            <h2>No {vegFilter !== 'All' ? vegFilter : ''} videos yet</h2>
             <p>Run <code>python manage.py seed_all</code> to add sample videos</p>
           </div>
         )}

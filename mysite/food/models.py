@@ -323,12 +323,13 @@ class FoodVideo(models.Model):
     food_item = models.ForeignKey(FoodItem, on_delete=models.SET_NULL, null=True, blank=True, related_name='videos')
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True)
-    video_url = models.URLField(blank=True)          # external URL (YouTube/Cloudinary)
+    video_url = models.URLField(blank=True)
     thumbnail = models.ImageField(upload_to='video_thumbs/', blank=True, null=True)
     views = models.PositiveIntegerField(default=0)
     likes = models.ManyToManyField(User, related_name='liked_videos', blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
+    is_veg = models.BooleanField(default=True)  # 🟢 veg / 🔴 non-veg
 
     class Meta:
         ordering = ['-created_at']

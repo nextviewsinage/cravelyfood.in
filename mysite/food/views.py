@@ -1216,8 +1216,13 @@ class FoodVideoViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         qs = FoodVideo.objects.filter(is_active=True).prefetch_related('likes')
         restaurant = self.request.query_params.get('restaurant')
+        veg = self.request.query_params.get('veg')
         if restaurant:
             qs = qs.filter(restaurant_id=restaurant)
+        if veg == 'true':
+            qs = qs.filter(is_veg=True)
+        elif veg == 'false':
+            qs = qs.filter(is_veg=False)
         return qs
 
     def retrieve(self, request, *args, **kwargs):

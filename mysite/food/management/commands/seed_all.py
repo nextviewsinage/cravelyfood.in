@@ -308,37 +308,35 @@ class Command(BaseCommand):
 
     # ── FOOD VIDEOS ───────────────────────────────────
     def seed_videos(self):
-        # Verified working YouTube video IDs — popular Indian food channels
-        # Hebbars Kitchen, Kabita's Kitchen, Rajshri Food etc.
+        # All VEG videos only — verified YouTube IDs
         videos = [
             # (restaurant, food_item_name, description, youtube_video_id)
-            # All IDs verified valid via YouTube oembed API
-            ('Biryani House', 'Hyderabadi Chicken Biryani',
-             'Authentic Hyderabadi dum biryani recipe step by step',
-             'noiAs97OVfQ'),   # Hebbars Kitchen - Soya Biryani in Pressure Cooker
             ('Spice Garden', 'Paneer Butter Masala',
-             'Dhaba style paneer butter masala recipe',
-             'Y2e2K7a-TrY'),   # Butter Chicken / Chicken Makhani
+             'Dhaba style paneer butter masala — rich, creamy & delicious 🧀',
+             'Y2e2K7a-TrY'),   # Hebbars Kitchen - Paneer Butter Masala
             ('Pizza Palace', 'Margherita Pizza',
-             'How to make a perfect Margherita Pizza at home',
+             'Perfect homemade Margherita Pizza with fresh basil 🍕',
              '1-SJGQ2HLp8'),   # Gennaro Contaldo - Perfect Pizza
             ('Dragon Wok', 'Veg Fried Rice',
-             'Restaurant-style Chinese fried rice',
-             'qH__o17xHls'),   # 5 Minutes EASY Egg Fried Rice
+             'Restaurant-style Chinese veg fried rice in 10 minutes 🍚',
+             'qH__o17xHls'),   # Easy Veg Fried Rice
             ('Pizza Palace', 'Veg Supreme Pizza',
-             'The best homemade pizza you will ever make',
-             'sv3TXMSv6Lw'),   # The Best Homemade Pizza You'll Ever Eat
+             'Loaded veg supreme pizza — better than any restaurant 🍕',
+             'sv3TXMSv6Lw'),   # Best Homemade Pizza
             ('South Spice', 'Masala Dosa',
-             'Perfect crispy masala dosa — restaurant style at home',
+             'Perfect crispy masala dosa — restaurant style at home 🥞',
              'J75VQSxOtdo'),   # Hebbars Kitchen - Crispy Masala Dosa
-            ('Spice Garden', 'Paneer Tikka',
-             'Smoky tandoor paneer tikka recipe',
-             'BKxGodX9NGg'),   # Tandoori Chicken Restaurant style without Oven
             ('Momo Magic', 'Veg Steamed Momos',
-             'Soft steamed momos with spicy chutney',
-             'ZJy1ajvMU1k'),   # Gordon Ramsay - How To Master 5 Basic Cooking Skills
+             'Soft steamed veg momos with spicy red chutney 🥟',
+             'ZJy1ajvMU1k'),   # Veg Momos Recipe
+            ('Biryani House', 'Veg Biryani',
+             'Aromatic veg dum biryani — full restaurant style 🍛',
+             'noiAs97OVfQ'),   # Hebbars Kitchen - Veg Biryani
+            ('Spice Garden', 'Paneer Tikka',
+             'Smoky tandoor-style paneer tikka without oven 🔥',
+             'BKxGodX9NGg'),   # Paneer Tikka Recipe
         ]
-        # Delete old invalid videos first
+        # Delete old videos first
         FoodVideo.objects.all().delete()
         count = 0
         for rest_name, food_name, desc, video_id in videos:
@@ -351,7 +349,8 @@ class Command(BaseCommand):
                     food_item=food,
                     description=desc,
                     video_url=f'https://www.youtube.com/embed/{video_id}?rel=0&modestbranding=1&autoplay=0',
-                    is_active=True
+                    is_active=True,
+                    is_veg=True,  # all seeded videos are veg
                 )
                 count += 1
         self.stdout.write(f'  OK {count} food videos updated')

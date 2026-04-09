@@ -357,7 +357,7 @@ class FoodVideoSerializer(serializers.ModelSerializer):
         model = FoodVideo
         fields = ['id', 'title', 'description', 'video_url', 'thumbnail_url',
                   'restaurant', 'restaurant_name', 'food_item', 'food_name',
-                  'views', 'like_count', 'user_liked', 'created_at']
+                  'views', 'like_count', 'user_liked', 'created_at', 'is_veg']
 
     def get_like_count(self, obj):
         return obj.likes.count()
