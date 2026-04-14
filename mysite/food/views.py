@@ -631,6 +631,156 @@ class DeliveryUpdateView(APIView):
         return Response({'status': order.status, 'message': 'Updated'})
 
 
+# ── AI CHATBOT ────────────────────────────────────────
+class AIChatbotView(APIView):
+    """
+    POST /ai/chatbot/
+    Body: { "message": "mujhe spicy veg chahiye under 200" }
+    Returns: { "reply": "...", "foods": [...], "quick_replies": [...] }
+    """
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        msg = (request.data.get('message') or '').strip().lower()
+        if not msg:
+            return Response({'reply': 'Kuch toh poocho! 😄', 'foods': [], 'quick_replies': []})
+
+        # ── Parse intent ──────────────────────────────
+        # Price filter
+        import re
+        price_limit = None
+        price_match = re.search(r'under\s*₹?\s*(\d+)|below\s*₹?\s*(\d+)|(\d+)\s*se\s*kam|(\d+)\s*ke\s*andar|less\s*than\s*₹?\s*(\d+)', msg)
+        if price_match:
+            price_limit = int(next(g for g in price_match.groups() if g))
+
+        # Veg intent
+        wants_veg = any(w in msg for w in ['veg', 'vegetarian', 'no meat', 'pure veg', 'sabzi'])
+        wants_nonveg = any(w in msg for w in ['non veg', 'nonveg', 'chicken', 'mutton', 'fish', 'egg', 'meat'])
+
+        # Taste/type intent
+        wants_spicy   = any(w in msg for w in ['spicy', 'teekha', 'hot', 'masaledar', 'tikha'])
+        wants_sweet   = any(w in msg for w in ['sweet', 'meetha', 'dessert', 'mithai'])
+        wants_light   = any(w in msg for w in ['light', 'healthy', 'diet', 'low cal', 'salad'])
+        wants_popular = any(w in msg for w in ['popular', 'bestseller', 'best', 'trending', 'famous'])
+        wants_cheap   = any(w in msg for w in ['cheap', 'budget', 'affordable', 'sasta', 'kam price'])
+
+        # Category keywords
+        CAT_MAP = {
+            'pizza':      ['pizza'],
+            'burger':     ['burger'],
+            'biryani':    ['biryani', 'biriyani'],
+            'dosa':       ['dosa', 'idli', 'south indian', 'uttapam', 'vada'],
+            'momos':      ['momo', 'dumpling'],
+            'noodles':    ['noodle', 'hakka', 'chowmein', 'chinese'],
+            'paneer':     ['paneer', 'cottage cheese'],
+            'snacks':     ['snack', 'samosa', 'fries', 'bhel', 'pav bhaji'],
+            'dessert':    ['dessert', 'cake', 'ice cream', 'gulab', 'sweet', 'brownie'],
+            'drinks':     ['drink', 'juice', 'lassi', 'chai', 'coffee', 'beverage'],
+            'sandwich':   ['sandwich', 'sub'],
+            'roll':       ['roll', 'wrap', 'kathi'],
+            'thali':      ['thali', 'meal'],
+        }
+        detected_cats = []
+        for cat, keywords in CAT_MAP.items():
+            if any(k in msg for k in keywords):
+                detected_cats.append(cat)
+
+        # ── Build queryset ────────────────────────────
+        qs = FoodItem.objects.filter(available=True).select_related('category', 'restaurant')
+
+        # Always veg-only (app is veg)
+        qs = qs.filter(is_veg=True)
+
+        if price_limit:
+            qs = qs.filter(price__lte=price_limit)
+
+        if wants_popular:
+            qs = qs.filter(is_bestseller=True)
+
+        if wants_sweet:
+            qs = qs.filter(
+                Q(category__name__icontains='dessert') |
+                Q(category__name__icontains='sweet') |
+                Q(category__name__icontains='cake') |
+                Q(name__icontains='gulab') | Q(name__icontains='halwa') |
+                Q(name__icontains='brownie') | Q(name__icontains='ice cream')
+            )
+        elif detected_cats:
+            q = Q()
+            for cat in detected_cats:
+                q |= Q(name__icontains=cat) | Q(category__name__icontains=cat)
+            qs = qs.filter(q)
+        elif wants_spicy:
+            qs = qs.filter(
+                Q(name__icontains='spicy') | Q(name__icontains='masala') |
+                Q(name__icontains='tikka') | Q(name__icontains='schezwan') |
+                Q(name__icontains='tandoori') | Q(description__icontains='spicy') |
+                Q(description__icontains='spiced')
+            )
+        elif wants_light:
+            qs = qs.filter(
+                Q(category__name__icontains='salad') | Q(category__name__icontains='soup') |
+                Q(name__icontains='salad') | Q(name__icontains='soup') |
+                Q(name__icontains='idli') | Q(name__icontains='poha') | Q(name__icontains='upma')
+            )
+        elif wants_cheap:
+            qs = qs.order_by('price')
+
+        foods = qs.order_by('-is_bestseller', 'price')[:6]
+
+        # Fallback if nothing found
+        if not foods.exists():
+            foods = FoodItem.objects.filter(available=True, is_veg=True).order_by('-is_bestseller')[:6]
+
+        foods_data = FoodItemSerializer(foods, many=True, context={'request': request}).data
+
+        # ── Build reply message ───────────────────────
+        reply = self._build_reply(msg, foods_data, price_limit, wants_spicy, wants_veg,
+                                  wants_sweet, wants_light, wants_popular, wants_cheap, detected_cats)
+
+        # ── Quick reply chips ─────────────────────────
+        quick_replies = ['🔥 Bestsellers', '💰 Under ₹100', '🌶️ Spicy food',
+                         '🍕 Pizza', '🍛 Biryani', '🥟 Momos', '🍰 Desserts']
+
+        return Response({
+            'reply': reply,
+            'foods': foods_data,
+            'quick_replies': quick_replies,
+        })
+
+    def _build_reply(self, msg, foods, price_limit, spicy, veg, sweet,
+                     light, popular, cheap, cats):
+        count = len(foods)
+        if count == 0:
+            return "😔 Sorry, koi item nahi mila. Kuch aur try karo!"
+
+        parts = []
+        if popular:
+            parts.append("🔥 Yeh hain hamare bestsellers")
+        elif spicy:
+            parts.append("🌶️ Spicy options mil gaye")
+        elif sweet:
+            parts.append("🍰 Meethe options yeh hain")
+        elif light:
+            parts.append("🥗 Light & healthy options")
+        elif cheap:
+            parts.append("💰 Sabse saste options")
+        elif cats:
+            emoji_map = {'pizza':'🍕','burger':'🍔','biryani':'🍛','dosa':'🥞',
+                         'momos':'🥟','noodles':'🍜','paneer':'🧀','snacks':'🍟',
+                         'dessert':'🍰','drinks':'🥤','sandwich':'🥪','roll':'🌯','thali':'🍱'}
+            e = emoji_map.get(cats[0], '🍽️')
+            parts.append(f"{e} {cats[0].title()} options yeh hain")
+        else:
+            parts.append("🍽️ Yeh items tumhare liye")
+
+        if price_limit:
+            parts.append(f"₹{price_limit} ke andar")
+
+        parts.append(f"— {count} options mile! 👇")
+        return ' '.join(parts)
+
+
 # ── AI FEED (Hyper-Personalized) ──────────────────────
 class AIFeedView(APIView):
     permission_classes = [permissions.AllowAny]

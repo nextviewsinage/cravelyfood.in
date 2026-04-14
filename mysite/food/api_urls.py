@@ -21,6 +21,7 @@ from .views import (
     SurgePricingView,
     BatchOptimizeView, AssignBatchView,
     PredictiveOrderingView,
+    AIChatbotView,
 )
 
 router = DefaultRouter()
@@ -57,6 +58,7 @@ urlpatterns = [
     path('ai/feed/', AIFeedView.as_view(), name='ai_feed'),
     path('ai/mood/', MoodFoodView.as_view(), name='mood_food'),
     path('ai/predictive/', PredictiveOrderingView.as_view(), name='predictive_ordering'),
+    path('ai/chatbot/', AIChatbotView.as_view(), name='ai_chatbot'),
     path('ai/image-search/', ImageSearchView.as_view(), name='image_search'),
     path('ai/voice-search/', VoiceSearchView.as_view(), name='voice_search'),
     path('loyalty/', LoyaltyView.as_view(), name='loyalty'),
