@@ -1670,7 +1670,7 @@ class WhatsAppMenuView(APIView):
     """
     permission_classes = [permissions.AllowAny]
 
-    WHATSAPP_NUMBER = '919876543210'  # Replace with actual business number
+    WHATSAPP_NUMBER = '916354203030'  # Cravely Food business number
 
     def get(self, request):
         # Get top 10 bestseller items
@@ -1679,7 +1679,7 @@ class WhatsAppMenuView(APIView):
             items = FoodItem.objects.filter(available=True)[:10]
 
         # Build WhatsApp message text
-        lines = ['🍽️ *FoodDelivery Menu*', '']
+        lines = ['🍽️ *Cravely Food Menu*', '']
         for i, item in enumerate(items, 1):
             veg = '🟢' if item.is_veg else '🔴'
             lines.append(f'{i}. {veg} *{item.name}* — ₹{item.price}')
