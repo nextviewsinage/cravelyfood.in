@@ -12,7 +12,7 @@ export default function Blog() {
     <div className="static-page">
       <div className="static-hero">
         <h1>Blog</h1>
-        <p>Food stories, tips, and updates from the FoodDelivery team.</p>
+        <p>Food stories, tips, and updates from the Cravely Food team.</p>
       </div>
       <div className="static-content">
         <div className="blog-grid">

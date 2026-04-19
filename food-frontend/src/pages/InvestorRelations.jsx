@@ -14,7 +14,7 @@ export default function InvestorRelations() {
         </div>
         <div className="static-card">
           <h2>📈 Financial Highlights</h2>
-          <p>FoodDelivery has demonstrated consistent growth with a 3x year-over-year increase in GMV. Our unit economics are improving quarter-on-quarter as we scale operations across 50+ cities.</p>
+          <p>Cravely Food has demonstrated consistent growth with a 3x year-over-year increase in GMV. Our unit economics are improving quarter-on-quarter as we scale operations across 50+ cities.</p>
         </div>
         <div className="static-card">
           <h2>🏦 Funding History</h2>
@@ -24,7 +24,7 @@ export default function InvestorRelations() {
         </div>
         <div className="static-card">
           <h2>📬 Investor Contact</h2>
-          <p>For investor queries, annual reports, or partnership discussions, contact us at <strong>investors@fooddelivery.in</strong></p>
+          <p>For investor queries, annual reports, or partnership discussions, contact us at <strong>investors@Cravely Food.in</strong></p>
         </div>
       </div>
     </div>

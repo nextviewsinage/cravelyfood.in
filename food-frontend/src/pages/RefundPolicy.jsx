@@ -11,7 +11,7 @@ export default function RefundPolicy() {
           { title: '⏱ Refund Timeline', body: 'Online payments (UPI/Card): 5-7 business days back to original payment method. COD orders: Refund issued as wallet credits within 24 hours, usable on your next order.' },
           { title: '❌ Non-Refundable Cases', body: 'Refunds are not applicable if you ordered the wrong item, changed your mind after the 2-minute cancellation window, or provided an incorrect delivery address.' },
           { title: '📋 How to Request a Refund', body: '1. Go to Orders page\n2. Select the order\n3. Click "Report an Issue"\n4. Describe the problem and submit\nOur team will review and respond within 24 hours.' },
-          { title: '📞 Need Help?', body: 'Contact our support team at support@fooddelivery.in or call 1800-123-4567 (9AM–11PM daily).' },
+          { title: '📞 Need Help?', body: 'Contact our support team at support@Cravely Food.in or call 1800-123-4567 (9AM–11PM daily).' },
         ].map((s) => (
           <div key={s.title} className="static-card">
             <h2>{s.title}</h2>

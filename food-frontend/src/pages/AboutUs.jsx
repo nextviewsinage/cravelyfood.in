@@ -8,7 +8,7 @@ export default function AboutUs() {
       <div className="static-content">
         <div className="static-card">
           <h2>🍽️ Who We Are</h2>
-          <p>FoodDelivery is India's fastest-growing food delivery platform, connecting millions of hungry customers with thousands of restaurants across the country. Founded in 2020, we've served over 10 million orders and counting.</p>
+          <p>Cravely Food is India's fastest-growing food delivery platform, connecting millions of hungry customers with thousands of restaurants across the country. Founded in 2020, we've served over 10 million orders and counting.</p>
         </div>
         <div className="static-card">
           <h2>🎯 Our Mission</h2>

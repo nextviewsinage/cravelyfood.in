@@ -17,7 +17,7 @@ export default function HelpCenter() {
       <div className="static-content">
         <div className="static-card" style={{ marginBottom: 32, background: '#fff7f0', border: '1px solid #ffe0cc' }}>
           <h2>📞 Contact Support</h2>
-          <p>Can't find your answer? Reach us at <strong>support@fooddelivery.in</strong> or call <strong>1800-123-4567</strong> (9AM–11PM)</p>
+          <p>Can't find your answer? Reach us at <strong>support@Cravely Food.in</strong> or call <strong>1800-123-4567</strong> (9AM–11PM)</p>
         </div>
         <div className="press-section-title">Frequently Asked Questions</div>
         <div className="faq-grid">

@@ -9,7 +9,7 @@ export default function Footer() {
         {/* Top: Brand + Social */}
         <div className="footer-top">
           <div className="footer-brand-block">
-            <div className="footer-brand">🍽️ FoodDelivery</div>
+            <div className="footer-brand">🍽️ Cravely Food</div>
             <p className="footer-desc">
               India's best food delivery platform. Order from top restaurants near you and get fresh food delivered in 30 minutes.
             </p>
@@ -77,7 +77,7 @@ export default function Footer() {
 
         {/* Bottom Bar */}
         <div className="footer-bottom">
-          <span>© {new Date().getFullYear()} FoodDelivery. All rights reserved.</span>
+          <span>© {new Date().getFullYear()} Cravely Food. All rights reserved.</span>
           <div className="footer-bottom-right">
             <span>🇮🇳 India</span>
             <span>Made with ❤️ in India</span>

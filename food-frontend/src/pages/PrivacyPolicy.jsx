@@ -12,8 +12,8 @@ export default function PrivacyPolicy() {
           { title: '3. Data Security', body: 'We use industry-standard encryption (SSL/TLS) to protect your data in transit. Payment information is processed through PCI-DSS compliant payment gateways and is never stored on our servers.' },
           { title: '4. Cookies', body: 'We use cookies to keep you logged in, remember your cart, and analyze site traffic. You can disable cookies in your browser settings, though some features may not work correctly.' },
           { title: '5. Third-Party Services', body: 'We use trusted third-party services for payments, maps, and analytics. These services have their own privacy policies and we encourage you to review them.' },
-          { title: '6. Your Rights', body: 'You have the right to access, correct, or delete your personal data at any time. Contact us at privacy@fooddelivery.in to exercise these rights.' },
-          { title: '7. Contact Us', body: 'For privacy-related queries, email us at privacy@fooddelivery.in or write to: FoodDelivery Pvt. Ltd., 123 Tech Park, Bangalore, Karnataka 560001.' },
+          { title: '6. Your Rights', body: 'You have the right to access, correct, or delete your personal data at any time. Contact us at privacy@Cravely Food.in to exercise these rights.' },
+          { title: '7. Contact Us', body: 'For privacy-related queries, email us at privacy@Cravely Food.in or write to: Cravely Food Pvt. Ltd., 123 Tech Park, Bangalore, Karnataka 560001.' },
         ].map((s) => (
           <div key={s.title} className="static-card">
             <h2>{s.title}</h2>

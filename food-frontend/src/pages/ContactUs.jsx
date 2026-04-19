@@ -33,7 +33,7 @@ export default function ContactUs() {
           {/* Info */}
           <div className="contact-info-col">
             {[
-              { icon: '📧', label: 'Email', value: 'support@fooddelivery.in' },
+              { icon: '📧', label: 'Email', value: 'support@Cravely Food.in' },
               { icon: '📞', label: 'Phone', value: '+9163-5420-3030 (9AM–11PM)' },
               { icon: '📍', label: 'Address', value: '123 Tech Park, Ahmedabad, Gujart, 382421' },
               { icon: '⏰', label: 'Support Hours', value: 'Monday – Sunday, 9AM to 11PM IST' },
