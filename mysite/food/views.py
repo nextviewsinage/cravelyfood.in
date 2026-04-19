@@ -631,6 +631,77 @@ class DeliveryUpdateView(APIView):
         return Response({'status': order.status, 'message': 'Updated'})
 
 
+# ── CALORIE & HEALTH AI ───────────────────────────────
+class NutritionView(APIView):
+    """
+    GET  /ai/nutrition/?food=Paneer Tikka
+    POST /ai/nutrition/  { "food_ids": [1,2,3] }  — bulk for cart
+    """
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request):
+        from .nutrition_db import get_nutrition, get_diet_tags
+        food_name = request.query_params.get('food', '').strip()
+        if not food_name:
+            return Response({'error': 'food param required'}, status=400)
+
+        nutrition = get_nutrition(food_name)
+        if not nutrition:
+            return Response({'error': f'Nutrition data not found for "{food_name}"'}, status=404)
+
+        tags = get_diet_tags(nutrition)
+        recommendation = self._recommend(nutrition)
+
+        return Response({
+            'nutrition': nutrition,
+            'tags': tags,
+            'recommendation': recommendation,
+        })
+
+    def post(self, request):
+        """Bulk nutrition for multiple food items (cart use)."""
+        from .nutrition_db import get_nutrition, get_diet_tags
+        food_ids = request.data.get('food_ids', [])
+        results = []
+        total = {'calories': 0, 'protein': 0, 'carbs': 0, 'fat': 0, 'fiber': 0}
+
+        foods = FoodItem.objects.filter(id__in=food_ids)
+        for food in foods:
+            n = get_nutrition(food.name)
+            if n:
+                results.append({
+                    'id': food.id,
+                    'name': food.name,
+                    'nutrition': n,
+                    'tags': get_diet_tags(n),
+                })
+                for k in total:
+                    total[k] += n.get(k, 0)
+
+        return Response({
+            'items': results,
+            'total': total,
+            'recommendation': self._recommend(total),
+        })
+
+    def _recommend(self, n):
+        cal = n.get('calories', 0)
+        prot = n.get('protein', 0)
+        fat = n.get('fat', 0)
+
+        if cal < 150 and prot >= 5:
+            return {'text': 'Perfect for weight loss & gym diet! 💪', 'icon': '🏋️', 'color': '#1b5e20'}
+        if prot >= 15:
+            return {'text': 'Excellent protein source — great for muscle building! 💪', 'icon': '💪', 'color': '#1565c0'}
+        if cal < 200:
+            return {'text': 'Light & healthy choice — ideal for diet! 🥗', 'icon': '🥗', 'color': '#2e7d32'}
+        if cal > 500:
+            return {'text': 'High calorie — best as a cheat meal or post-workout! 🔥', 'icon': '🔥', 'color': '#e65100'}
+        if fat > 20:
+            return {'text': 'Rich & indulgent — enjoy in moderation 😋', 'icon': '😋', 'color': '#f57c00'}
+        return {'text': 'Balanced meal — good for everyday diet! ✅', 'icon': '✅', 'color': '#388e3c'}
+
+
 # ── AI CHATBOT ────────────────────────────────────────
 class AIChatbotView(APIView):
     """

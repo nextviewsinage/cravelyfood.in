@@ -33,6 +33,7 @@ const MORE_LINKS_LOGGED_IN = [
   { to: '/referral', label: '🎁 Refer & Earn' },
   { to: '/videos', label: '🎥 Food Reels' },
   { to: '/grocery', label: '🛒 Grocery' },
+  { to: '/nutrition', label: '🥗 Calorie AI' },
 ];
 
 function Dropdown({ label, links, wide = false }) {

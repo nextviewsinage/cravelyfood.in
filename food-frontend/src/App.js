@@ -35,6 +35,7 @@ import Referral from "./pages/Referral";
 import VideoFeed from "./pages/VideoFeed";
 import Grocery from "./pages/Grocery";
 import Badges from "./pages/Badges";
+import NutritionAI from "./pages/NutritionAI";
 import "./App.css";
 
 function App() {
@@ -74,6 +75,7 @@ function App() {
         <Route path="/videos" element={<VideoFeed />} />
         <Route path="/grocery" element={<Grocery />} />
         <Route path="/badges" element={<Badges />} />
+        <Route path="/nutrition" element={<NutritionAI />} />
       </Routes>
       <Footer />
       <AIChatbot />
