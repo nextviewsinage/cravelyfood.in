@@ -198,14 +198,14 @@ export default function FoodCard({ food = {} }) {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             {food.surge_active ? (
               <>
-                <span className="food-price" style={{ color: '#ff5200' }}>
-                  {food.surge_emoji} ₹{food.dynamic_price ?? food.price}
-                </span>
                 <span style={{
                   fontSize: '0.72rem', color: '#999',
                   textDecoration: 'line-through', lineHeight: 1,
                 }}>
                   ₹{food.price}
+                </span>
+                <span className="food-price" style={{ color: '#ff5200' }}>
+                  {food.surge_emoji} ₹{food.dynamic_price ?? food.price}
                 </span>
               </>
             ) : (
